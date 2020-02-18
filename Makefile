@@ -19,6 +19,16 @@ help:  ## Print the help documentation
 #
 
 
+.PHONY: check_hosts
+check_hosts: .check_hosts.stamp ## Check that hosts are in the /etc/hosts file
+.check_hosts.stamp: scripts/check-hosts-file
+ifndef CIRCLECI
+	scripts/check-hosts-file
+else
+	@echo "Not checking hosts on CircleCI."
+endif
+	touch .check_hosts.stamp
+
 .PHONY: check_go_version
 check_go_version: .check_go_version.stamp ## Check that the correct Golang version is installed
 .check_go_version.stamp: scripts/check-go-version
@@ -30,12 +40,23 @@ check_gopath: .check_gopath.stamp ## Check that $GOPATH exists in $PATH
 .check_gopath.stamp:
 	scripts/check-gopath
 	touch .check_gopath.stamp
+
+.PHONY: check_log_dir
+check_log_dir: ## Make sure we have a log directory
+	mkdir -p log
+
+#
+# ----- END CHECK TARGETS -----
+#
+
 #
 # ----- START BIN TARGETS -----
 #
 
 ### Go Tool Targets
 
+bin/gin: .check_go_version.stamp .check_gopath.stamp
+	go build -ldflags "$(LDFLAGS)" -o bin/gin github.com/codegangsta/gin
 bin/swagger: .check_go_version.stamp .check_gopath.stamp
 	go build -ldflags "$(LDFLAGS)" -o bin/swagger github.com/go-swagger/go-swagger/cmd/swagger
 
@@ -65,3 +86,31 @@ pkg/gen/: $(shell find swagger -type f -name *.yaml)
 
 .PHONY: server_build
 server_build: bin/orders ## Build the server
+
+# This command is for running the server by itself, it will serve the compiled frontend on its own
+# Note: Don't double wrap with aws-vault because the pkg/cli/vault.go will handle it
+server_run_standalone: check_log_dir server_build db_dev_run
+	DEBUG_LOGGING=true ./bin/milmove serve 2>&1 | tee -a log/dev.log
+
+# This command will rebuild the swagger go code and rerun server on any changes
+server_run:
+	find ./swagger -type f -name "*.yaml" | entr -c -r make server_run_default
+# This command runs the server behind gin, a hot-reload server
+# Note: Gin is not being used as a proxy so assigning odd port and laddr to keep in IPv4 space.
+# Note: The INTERFACE envar is set to configure the gin build, milmove_gin, local IP4 space with default port 8080.
+server_run_default: .check_hosts.stamp .check_go_version.stamp .check_gopath.stamp check_log_dir bin/gin server_generate db_dev_run
+	INTERFACE=localhost DEBUG_LOGGING=true \
+	$(AWS_VAULT) ./bin/gin \
+		--build ./cmd/orders \
+		--bin /bin/orders_gin \
+		--laddr 127.0.0.1 --port 9001 \
+		--excludeDir node_modules \
+		--immediate \
+		--buildArgs "-i -ldflags=\"$(WEBSERVER_LDFLAGS)\"" \
+		serve \
+		2>&1 | tee -a log/dev.log
+
+.PHONY: build_tools
+build_tools: bin/gin \
+	bin/swagger \
+	bin/rds-ca-2019-root.pem  ## Build all tools
