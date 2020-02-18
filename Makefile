@@ -1,5 +1,19 @@
 
 
+# Convenience for LDFLAGS
+WEBSERVER_LDFLAGS=-X main.gitBranch=$(shell git branch | grep \* | cut -d ' ' -f2) -X main.gitCommit=$(shell git rev-list -1 HEAD)
+GC_FLAGS=-trimpath=$(GOPATH)
+
+
+.PHONY: help
+help:  ## Print the help documentation
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+
+#
+# ----- END PREAMBLE -----
+#
+
 #
 # ----- START CHECK TARGETS -----
 #

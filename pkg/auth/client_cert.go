@@ -8,7 +8,7 @@ import (
 
 	"github.com/gobuffalo/pop"
 
-	"../models"
+	"github.com/transcom/milmove_orders/pkg/models"
 )
 
 type authClientCertKey string
