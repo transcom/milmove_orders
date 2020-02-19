@@ -10,6 +10,7 @@ if [[ -z $(git status -uno --porcelain pkg/gen/ ) ]]; then
   exit 0
 else
   echo "generated code was modified!"
+  git status
   git --no-pager diff
   exit 1
 fi
