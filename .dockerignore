@@ -12,9 +12,6 @@ __snapshots__
 /tmp
 /log
 
-# All compiled binaries
-/bin/
-
 # misc
 .DS_Store
 .idea
