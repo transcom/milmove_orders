@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	"github.com/transcom/milmove_orders/pkg/gen/ordersmessages"
+	ordersmessages "github.com/transcom/milmove_orders/pkg/gen/ordersmessages"
 )
 
 // PostRevisionCreatedCode is the HTTP code returned for type PostRevisionCreated
