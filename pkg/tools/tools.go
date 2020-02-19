@@ -14,4 +14,7 @@ import (
 
 	// Test packages
 	_ "github.com/stretchr/objx"
+
+	// Install go-junit-report for CirclCI test result report generation
+	_ "github.com/jstemmer/go-junit-report"
 )

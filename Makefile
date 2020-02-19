@@ -98,6 +98,10 @@ bin/gin: .check_go_version.stamp .check_gopath.stamp
 bin/swagger: .check_go_version.stamp .check_gopath.stamp
 	go build -ldflags "$(LDFLAGS)" -o bin/swagger github.com/go-swagger/go-swagger/cmd/swagger
 
+# No static linking / $(LDFLAGS) because go-junit-report is only used for building the CirlceCi test report
+bin/go-junit-report: .check_go_version.stamp .check_gopath.stamp
+	go build -o bin/go-junit-report github.com/jstemmer/go-junit-report
+
 ### Cert Targets
 
 bin/rds-ca-2019-root.pem:

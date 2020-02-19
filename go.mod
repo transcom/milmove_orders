@@ -20,6 +20,7 @@ require (
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/imdario/mergo v0.3.8
 	github.com/jessevdk/go-flags v1.4.0
+	github.com/jstemmer/go-junit-report v0.9.1
 	github.com/lib/pq v1.3.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v0.0.5

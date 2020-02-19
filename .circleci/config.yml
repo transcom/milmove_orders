@@ -136,6 +136,7 @@ jobs:
           keys:
             - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
       - run: echo 'export PATH=${PATH}:~/go/bin:~/transcom/milmove_orders/bin' >> $BASH_ENV
+      - run: make bin/swagger
       - run: scripts/gen-server
       - run: scripts/check-generated-code
       - save_cache:
