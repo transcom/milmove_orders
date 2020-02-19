@@ -155,12 +155,6 @@ jobs:
             - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}}
       - restore_cache:
           keys:
-            - v2-cache-yarn-v2-{{ checksum "yarn.lock" }}
-      - restore_cache:
-          keys:
-            - v2-milmove_orders-node-modules-{{ checksum "yarn.lock" }}
-      - restore_cache:
-          keys:
             - pre-commit-dot-cache-{{ checksum ".pre-commit-config.yaml" }}
       - run: echo 'export PATH=${PATH}:~/go/bin:~/transcom/milmove_orders/bin' >> $BASH_ENV
       - run: make bin/swagger
