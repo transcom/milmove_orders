@@ -347,6 +347,7 @@ pretty: gofmt ## Run code through Golang formatters
 
 .PHONY: docker_circleci
 docker_circleci:
+	docker pull trussworks/circleci-docker-primary:latest
 	docker run -it --rm=true -v $(PWD):$(PWD) -w $(PWD) trussworks/circleci-docker-primary:latest bash
 
 .PHONY: prune_images
