@@ -345,6 +345,10 @@ pre_commit_tests: .client_deps.stamp bin/swagger ## Run pre-commit tests
 .PHONY: pretty
 pretty: gofmt ## Run code through Golang formatters
 
+.PHONY: docker_circleci
+docker_circleci:
+	docker run -it --rm=true -v $(PWD):$(PWD) -w $(PWD) trussworks/circleci-docker-primary:latest bash
+
 .PHONY: prune_images
 prune_images:  ## Prune docker images
 	@echo '****************'
