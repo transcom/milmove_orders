@@ -124,7 +124,7 @@ bin/orders:
 
 .PHONY: server_generate
 server_generate: .check_go_version.stamp .check_gopath.stamp pkg/gen/ ## Generate golang server code from Swagger files
-pkg/gen/: $(shell find swagger -type f -name *.yaml)
+pkg/gen/: bin/swagger $(shell find swagger -type f -name *.yaml)
 	scripts/gen-server
 
 .PHONY: server_build
