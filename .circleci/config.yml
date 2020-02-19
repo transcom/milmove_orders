@@ -1,0 +1,234 @@
+############
+#
+# Caches
+#
+# Caches may have a `v1-` prefix, since caches in CircleCI 2.0 are immutable.
+# A prefix provides an easy way to invalidate a cache.  See https://circleci.com/docs/2.0/caching/#clearing-cache
+#
+# Please do not use docker_layer_caching! It costs too much money to run. Please set to `false`.
+#
+############
+
+version: '2.1'
+
+executors:
+  # `milmove_orders_small` and `milmove_orders_medium` use the `trussworks/circleci-docker-primary` docker image with a checkout of the milmove_orders code
+  milmove_orders_small:
+    resource_class: small
+    working_directory: ~/transcom/milmove_orders
+    docker:
+      - image: trussworks/circleci-docker-primary:c3a4d876a5681cceef9f927392732c259308d158
+  milmove_orders_medium:
+    resource_class: medium
+    working_directory: ~/transcom/milmove_orders
+    docker:
+      - image: trussworks/circleci-docker-primary:c3a4d876a5681cceef9f927392732c259308d158
+  # `milmove_orders_and_postgres_medium` adds a secondary postgres container to be used during testing.
+  milmove_orders_and_postgres_medium:
+    resource_class: medium
+    working_directory: ~/transcom/milmove_orders
+    docker:
+      - image: trussworks/circleci-docker-primary:c3a4d876a5681cceef9f927392732c259308d158
+      - image: postgres:10.10
+        environment:
+          - POSTGRES_PASSWORD: mysecretpassword
+          - POSTGRES_DB: test_db
+        command: '-c fsync=off -c full_page_writes=off -c max_connections=200'
+
+commands:
+  announce_failure:
+    parameters:
+    steps:
+      - run:
+          name: Announce failure
+          command: |
+            [[ $CIRCLE_BRANCH = master ]] || exit 0
+            scripts/circleci-announce-broken-branch
+          when: on_fail
+
+  server_tests_step:
+    parameters:
+      application:
+        type: string
+    steps:
+      - run:
+          name: make server_test_build for <<parameters.application>>
+          command: make server_test_build
+          environment:
+            APPLICATION: "<< parameters.application >>"
+            GOFLAGS: "-p=4"
+      - run:
+          name: make db_test_reset for <<parameters.application>>
+          command: make db_test_reset
+          environment:
+            APPLICATION: "<< parameters.application >>"
+            DB_PASSWORD: mysecretpassword
+            DB_USER: postgres
+            DB_HOST: localhost
+            DB_PORT_TEST: 5433
+            DB_PORT: 5432
+            DB_NAME: test_db
+            DB_NAME_TEST: test_db
+            MIGRATION_MANIFEST: '/home/circleci/transcom/milmove_orders/migrations/<< parameters.application >>/migrations_manifest.txt'
+            MIGRATION_PATH: 'file:///home/circleci/transcom/milmove_orders/migrations/<< parameters.application >>/schema;file:///home/circleci/transcom/milmove_orders/migrations/<< parameters.application >>/secure'
+      - run:
+          name: make db_test_migrate for <<parameters.application>>
+          command: make db_test_migrate
+          environment:
+            APPLICATION: "<< parameters.application >>"
+            DB_PASSWORD: mysecretpassword
+            DB_USER: postgres
+            DB_HOST: localhost
+            DB_PORT_TEST: 5433
+            DB_PORT: 5432
+            DB_NAME: test_db
+            DB_NAME_TEST: test_db
+            MIGRATION_MANIFEST: '/home/circleci/transcom/milmove_orders/migrations/<< parameters.application >>/migrations_manifest.txt'
+            MIGRATION_PATH: 'file:///home/circleci/transcom/milmove_orders/migrations/<< parameters.application >>/schema;file:///home/circleci/transcom/milmove_orders/migrations/<< parameters.application >>/secure'
+      - run:
+          name: make server_test_standalone for <<parameters.application>>
+          command: |
+            echo 'export LOGIN_GOV_SECRET_KEY=$(echo $E2E_LOGIN_GOV_SECRET_KEY | base64 --decode)' >> $BASH_ENV
+            source $BASH_ENV
+            make server_test_standalone
+          environment:
+            APPLICATION: "<< parameters.application >>"
+            DB_PASSWORD: mysecretpassword
+            DB_USER: postgres
+            DB_HOST: localhost
+            DB_PORT_TEST: 5433
+            DB_PORT: 5432
+            DB_NAME: test_db
+            DB_NAME_TEST: test_db
+            EIA_KEY: db2522a43820268a41a802a16ae9fd26 # dummy key generated with openssl rand -hex 16
+            ENV: test
+            ENVIRONMENT: test
+            GOFLAGS: "-p=4"
+            JUNIT: 1
+            MIGRATION_MANIFEST: '/home/circleci/transcom/milmove_orders/migrations/<< parameters.application >>/migrations_manifest.txt'
+            MIGRATION_PATH: 'file:///home/circleci/transcom/milmove_orders/migrations/<< parameters.application >>/schema;file:///home/circleci/transcom/milmove_orders/migrations/<< parameters.application >>/secure'
+            SERVE_API_INTERNAL: true
+
+jobs:
+  # `pre_deps_golang` is used for caching Go module sources
+  pre_deps_golang:
+    executor: milmove_orders_medium
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+      - run:
+          name: Install dependencies
+          command: for i in $(seq 1 5); do go get ./... && s=0 && break || s=$? && sleep 5; done; (exit $s)
+      - save_cache:
+          key: go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+          paths:
+            - '/go/pkg/mod'
+      - announce_failure
+
+  # `check_generated_code` is used to ensure generated code doesn't change
+  check_generated_code:
+    executor: milmove_orders_medium
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+      - run: echo 'export PATH=${PATH}:~/go/bin:~/transcom/milmove_orders/bin' >> $BASH_ENV
+      - run: scripts/gen-server
+      - run: scripts/check-generated-code
+      - save_cache:
+          key: go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+          paths:
+            - '/go/pkg/mod'
+      - announce_failure
+
+  # `pre_test` runs pre-commit against all files.
+  pre_test:
+    executor: milmove_orders_medium
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}}
+      - restore_cache:
+          keys:
+            - v2-cache-yarn-v2-{{ checksum "yarn.lock" }}
+      - restore_cache:
+          keys:
+            - v2-milmove_orders-node-modules-{{ checksum "yarn.lock" }}
+      - restore_cache:
+          keys:
+            - pre-commit-dot-cache-{{ checksum ".pre-commit-config.yaml" }}
+      - run: echo 'export PATH=${PATH}:~/go/bin:~/transcom/milmove_orders/bin' >> $BASH_ENV
+      - run: make bin/swagger
+      # this is so we can avoid go mod downloading and resulting in an error on a false positive
+      - run: scripts/pre-commit-go-mod || exit 0
+      - run:
+          name: Run pre-commit tests without golangci-lint
+          command: SKIP=golangci-lint pre-commit run --all-files
+      # The output of golangci-lint is an artifact towards STIG compliance
+      - run:
+          name: Run pre-commit tests with golangci-lint only
+          command: |
+            echo 'export GOLANGCI_LINT_CONCURRENCY=1' >> $BASH_ENV
+            echo 'export GOLANGCI_LINT_VERBOSE=-v' >> $BASH_ENV
+            source $BASH_ENV
+            mkdir -p tmp/test-results/pretest
+            pre-commit run -v --all-files golangci-lint | tee tmp/test-results/pretest/golangci-lint.out
+      # `pre-commit-dot-cache-{{ checksum ".pre-commit-config.yaml" }}` is used to cache pre-commit plugins.
+      - save_cache:
+          key: pre-commit-dot-cache-{{ checksum ".pre-commit-config.yaml" }}
+          paths:
+            - ~/.cache/pre-commit
+      - store_artifacts:
+          path: ~/transcom/milmove_orders/tmp/test-results
+          destination: test-results
+      - announce_failure
+
+  # `server_test` runs the server side Go tests
+  server_test:
+    executor: milmove_orders_and_postgres_medium
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+      - run: echo 'export PATH=${PATH}:~/go/bin:~/transcom/milmove_orders/bin' >> $BASH_ENV
+      - run: sudo apt-get update && sudo apt-get install -yy postgresql-client
+      - run: make bin/go-junit-report
+      - run: make bin/milmove
+      - server_tests_step:
+          application: app
+      - server_tests_step:
+          application: orders
+      - store_artifacts:
+          path: ~/transcom/milmove_orders/tmp/test-results
+          destination: test-results
+      - store_test_results:
+          path: ~/transcom/milmove_orders/tmp/test-results
+      - announce_failure
+
+workflows:
+  version: 2
+
+  app:
+    jobs:
+      - pre_deps_golang
+
+      - check_generated_code:
+          requires:
+            - pre_deps_golang
+
+      - pre_test:
+          requires:
+            - pre_deps_golang
+
+      - server_test:
+          requires:
+            - pre_deps_golang
+          # if testing on experimental, you can disable these tests by using the commented block below.
+          filters:
+            branches:
+              ignore: placeholder_branch_name

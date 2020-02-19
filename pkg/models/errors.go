@@ -6,9 +6,6 @@ import (
 
 // These are errors that are returned by various model functions
 
-// ErrCreateViolatesUniqueConstraint is returned if you call create and violate a unique constraint.
-var ErrCreateViolatesUniqueConstraint = errors.New("CREATE_VIOLATES_UNIQUE")
-
 // ErrFetchNotFound means that the requested record does not exist
 var ErrFetchNotFound = errors.New("FETCH_NOT_FOUND")
 
