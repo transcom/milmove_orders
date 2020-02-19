@@ -34,6 +34,12 @@ require (
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 )
 
+// transcom/sqlx v1.2.1 is just jmoiron's 1.2.0 with custom driver fixes
+// This is a temporary solution till https://github.com/jmoiron/sqlx/pull/560
+// is merged or a better solution is completed as mentioned in
+// https://github.com/jmoiron/sqlx/pull/520
+replace github.com/jmoiron/sqlx v1.2.0 => github.com/transcom/sqlx v1.2.1
+
 // Update to ignore compiler warnings on macOS catalina
 // https://github.com/keybase/go-keychain/pull/55
 // https://github.com/99designs/aws-vault/pull/427
