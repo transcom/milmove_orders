@@ -15,7 +15,6 @@ type ClientCert struct {
 	ID                          uuid.UUID `json:"id" db:"id"`
 	Sha256Digest                string    `db:"sha256_digest"`
 	Subject                     string    `db:"subject"`
-	AllowDpsAuthAPI             bool      `db:"allow_dps_auth_api"`
 	AllowOrdersAPI              bool      `db:"allow_orders_api"`
 	CreatedAt                   time.Time `db:"created_at"`
 	UpdatedAt                   time.Time `db:"updated_at"`
@@ -29,7 +28,6 @@ type ClientCert struct {
 	AllowMarineCorpsOrdersWrite bool      `db:"allow_marine_corps_orders_write"`
 	AllowNavyOrdersRead         bool      `db:"allow_navy_orders_read"`
 	AllowNavyOrdersWrite        bool      `db:"allow_navy_orders_write"`
-	AllowPrime                  bool      `db:"allow_prime"`
 }
 
 // Validate gets run every time you call a "pop.Validate*" (pop.ValidateAndSave, pop.ValidateAndCreate, pop.ValidateAndUpdate) method.

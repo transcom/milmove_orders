@@ -11,8 +11,8 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/transcom/mymove/pkg/models"
-	"github.com/transcom/mymove/pkg/testingsuite"
+	"github.com/transcom/milmove_orders/pkg/models"
+	"github.com/transcom/milmove_orders/pkg/testingsuite"
 )
 
 type fakeModel struct {
@@ -39,23 +39,20 @@ func TestErrorsSuite(t *testing.T) {
 
 func (suite *ErrorsSuite) TestResponseForErrorWhenASQLErrorIsEncountered() {
 	var actual middleware.Responder
-	var signedCertification []*models.SignedCertification
+	var electronicOrder []*models.ElectronicOrder
 	var noTableModel []*fakeModel
-	var invalidUpload = models.Upload{}
 
 	// invalid column
-	errInvalidColumn := suite.DB().Where("move_iid = $1", "123").All(&signedCertification)
+	errInvalidColumn := suite.DB().Where("move_iid = $1", "123").All(&electronicOrder)
 	// invalid arguments
-	errInvalidArguments := suite.DB().Where("id in (?) and foo = ?", 1, 2, 3, "bar").All(signedCertification)
+	errInvalidArguments := suite.DB().Where("id in (?) and foo = ?", 1, 2, 3, "bar").All(electronicOrder)
 	// invalid table
 	errNoTable := suite.DB().Where("1=1").First(noTableModel)
 	// invalid sql
-	errInvalidQuery := suite.DB().Where("this should not compile").All(&signedCertification)
-	// key constraint error
-	errFK := suite.DB().Create(&invalidUpload)
+	errInvalidQuery := suite.DB().Where("this should not compile").All(&electronicOrder)
 
 	// slice to hold all errors and assert against
-	errs := []error{errInvalidColumn, errNoTable, errInvalidArguments, errInvalidQuery, errFK}
+	errs := []error{errInvalidColumn, errNoTable, errInvalidArguments, errInvalidQuery}
 
 	for _, err := range errs {
 		actual = ResponseForError(suite.logger, err)

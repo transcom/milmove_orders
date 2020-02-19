@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"crypto/tls"
 	"encoding/json"
@@ -30,9 +29,10 @@ import (
 	"goji.io/pat"
 
 	"github.com/transcom/milmove_orders/pkg/auth"
-	"github.com/transcom/milmove_orders/pkg/certs"
 	"github.com/transcom/milmove_orders/pkg/handlers"
 	"github.com/transcom/milmove_orders/pkg/handlers/ordersapi"
+
+	"github.com/transcom/mymove/pkg/certs"
 	"github.com/transcom/mymove/pkg/cli"
 	"github.com/transcom/mymove/pkg/ecs"
 	"github.com/transcom/mymove/pkg/iws"
@@ -186,26 +186,6 @@ func fileHandler(entrypoint string) http.HandlerFunc {
 	}
 }
 
-// indexHandler returns a handler that will serve the resulting content
-func indexHandler(buildDir string, logger logger) http.HandlerFunc {
-
-	indexPath := path.Join(buildDir, "index.html")
-	// #nosec - indexPath does not come from user input
-	indexHTML, err := ioutil.ReadFile(indexPath)
-	if err != nil {
-		logger.Fatal("could not read index.html template: run make client_build", zap.Error(err))
-	}
-
-	stat, err := os.Stat(indexPath)
-	if err != nil {
-		logger.Fatal("could not stat index.html template", zap.Error(err))
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.ServeContent(w, r, "index.html", stat.ModTime(), bytes.NewReader(indexHTML))
-	}
-}
-
 func serveFunction(cmd *cobra.Command, args []string) error {
 
 	var logger *zap.Logger
@@ -225,7 +205,10 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 					}
 				})
 			}
-			logger.Sync()
+			err := logger.Sync()
+			if err != nil {
+				logger.Error("error syncing logger", zap.Error(err))
+			}
 		}
 	}()
 
@@ -542,7 +525,10 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 	}
 
 	// make sure we flush any pending startup messages
-	logger.Sync()
+	errLoggerSync := logger.Sync()
+	if errLoggerSync != nil {
+		logger.Error("error syncing logger", zap.Error(errLoggerSync))
+	}
 
 	// Create a buffered channel that accepts 1 signal at a time.
 	quit := make(chan os.Signal, 1)
@@ -556,7 +542,10 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 	logger.Info("received signal for graceful shutdown of server", zap.Any("signal", sig))
 
 	// flush message that we received signal
-	logger.Sync()
+	errLoggerSync = logger.Sync()
+	if errLoggerSync != nil {
+		logger.Error("error syncing logger", zap.Error(errLoggerSync))
+	}
 
 	gracefulShutdownTimeout := v.GetDuration(cli.GracefulShutdownTimeoutFlag)
 
@@ -566,7 +555,10 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 	logger.Info("Waiting for listeners to be shutdown", zap.Duration("timeout", gracefulShutdownTimeout))
 
 	// flush message that we are waiting on listeners
-	logger.Sync()
+	errLoggerSync = logger.Sync()
+	if errLoggerSync != nil {
+		logger.Error("error syncing logger", zap.Error(errLoggerSync))
+	}
 
 	wg := &sync.WaitGroup{}
 	var shutdownErrors sync.Map
@@ -597,7 +589,10 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 
 	wg.Wait()
 	logger.Info("All listeners are shutdown")
-	logger.Sync()
+	errLoggerSync = logger.Sync()
+	if errLoggerSync != nil {
+		logger.Error("error syncing logger", zap.Error(errLoggerSync))
+	}
 
 	var dbCloseErr error
 	dbClose.Do(func() {
@@ -622,7 +617,10 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 		logger.Error("error closing database connections", zap.Error(dbCloseErr))
 	}
 
-	logger.Sync()
+	errLoggerSync = logger.Sync()
+	if errLoggerSync != nil {
+		logger.Error("error syncing logger", zap.Error(errLoggerSync))
+	}
 
 	if shutdownError {
 		os.Exit(1)

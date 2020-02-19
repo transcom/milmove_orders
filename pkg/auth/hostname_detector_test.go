@@ -21,14 +21,12 @@ func (suite *authSuite) TestOrdersDetector() {
 
 	req, _ := http.NewRequest("GET", "/some_url", nil)
 	req.Host = ordersMoveMil
-	session := Session{}
-	ordersDetector.ServeHTTP(rr, req.WithContext(SetSessionInRequestContext(req, &session)))
+	ordersDetector.ServeHTTP(rr, req)
 	suite.Equal(http.StatusOK, rr.Code, "Should get 200 OK")
 
 	req, _ = http.NewRequest("GET", "/some_url", nil)
 	req.Host = strings.ToUpper(ordersMoveMil)
-	session = Session{}
-	ordersDetector.ServeHTTP(rr, req.WithContext(SetSessionInRequestContext(req, &session)))
+	ordersDetector.ServeHTTP(rr, req)
 	suite.Equal(http.StatusOK, rr.Code, "Should get 200 OK")
 
 	notOrdersTestHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +36,6 @@ func (suite *authSuite) TestOrdersDetector() {
 
 	req, _ = http.NewRequest("GET", "/some_url", nil)
 	req.Host = "totally.bogus.hostname"
-	session = Session{}
-	notOrdersDetector.ServeHTTP(rr, req.WithContext(SetSessionInRequestContext(req, &session)))
+	notOrdersDetector.ServeHTTP(rr, req)
 	suite.Equal(http.StatusBadRequest, rr.Code, "Should get 400 Bad Request")
 }

@@ -10,12 +10,11 @@ func (suite *ModelSuite) Test_FetchClientCert() {
 	digest := "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
 	subject := "/C=US/ST=DC/L=Washington/O=Test/OU=Test Cert/CN=localhost"
 	certNew := models.ClientCert{
-		Sha256Digest:    digest,
-		Subject:         subject,
-		AllowDpsAuthAPI: true,
-		AllowOrdersAPI:  true,
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		Sha256Digest:   digest,
+		Subject:        subject,
+		AllowOrdersAPI: true,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
 	}
 	suite.MustSave(&certNew)
 

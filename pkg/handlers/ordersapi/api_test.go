@@ -11,7 +11,6 @@ import (
 	"github.com/transcom/milmove_orders/pkg/auth"
 	"github.com/transcom/milmove_orders/pkg/handlers"
 	"github.com/transcom/milmove_orders/pkg/models"
-	"github.com/transcom/milmove_orders/pkg/notifications"
 	"github.com/transcom/milmove_orders/pkg/testingsuite"
 )
 
@@ -28,7 +27,10 @@ func (suite *HandlerSuite) AuthenticateClientCertRequest(req *http.Request, cert
 
 // SetupTest sets up the test suite by preparing the DB
 func (suite *HandlerSuite) SetupTest() {
-	suite.DB().TruncateAll()
+	errTruncateAll := suite.DB().TruncateAll()
+	if errTruncateAll != nil {
+		log.Panicf("failed to truncate database: %#v", errTruncateAll)
+	}
 }
 
 // AfterTest completes tests by trying to close open files
@@ -46,7 +48,7 @@ func TestHandlerSuite(t *testing.T) {
 	}
 
 	hs := &HandlerSuite{
-		BaseHandlerTestSuite: handlers.NewBaseHandlerTestSuite(logger, notifications.NewStubNotificationSender("milmovelocal", logger), testingsuite.CurrentPackage()),
+		BaseHandlerTestSuite: handlers.NewBaseHandlerTestSuite(logger, testingsuite.CurrentPackage()),
 	}
 
 	suite.Run(t, hs)
@@ -61,7 +63,6 @@ func makeAllPowerfulClientCert() *models.ClientCert {
 		AllowArmyOrdersWrite:        true,
 		AllowCoastGuardOrdersRead:   true,
 		AllowCoastGuardOrdersWrite:  true,
-		AllowDpsAuthAPI:             true,
 		AllowMarineCorpsOrdersRead:  true,
 		AllowMarineCorpsOrdersWrite: true,
 		AllowNavyOrdersRead:         true,

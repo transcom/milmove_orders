@@ -9,6 +9,7 @@ import (
 
 	"github.com/transcom/milmove_orders/pkg/auth"
 	"github.com/transcom/milmove_orders/pkg/logging"
+
 	"github.com/transcom/mymove/pkg/iws"
 )
 

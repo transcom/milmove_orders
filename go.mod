@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/aws/aws-sdk-go v1.29.4
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/codegangsta/gin v0.0.0-20171026143024-cafe2ce98974
 	github.com/go-openapi/errors v0.19.3
 	github.com/go-openapi/loads v0.19.4
 	github.com/go-openapi/runtime v0.19.10
@@ -12,10 +12,13 @@ require (
 	github.com/go-openapi/strfmt v0.19.4
 	github.com/go-openapi/swag v0.19.7
 	github.com/go-openapi/validate v0.19.6
+	github.com/go-swagger/go-swagger v0.21.0
+	github.com/gobuffalo/envy v1.9.0
 	github.com/gobuffalo/pop v4.13.1+incompatible
 	github.com/gobuffalo/validate v2.0.4+incompatible
+	github.com/gofrs/flock v0.7.1
 	github.com/gofrs/uuid v3.2.0+incompatible
-	github.com/gorilla/csrf v1.6.2
+	github.com/imdario/mergo v0.3.8
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/lib/pq v1.3.0
 	github.com/pkg/errors v0.9.1
@@ -23,6 +26,7 @@ require (
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.6.2
+	github.com/stretchr/objx v0.2.0
 	github.com/stretchr/testify v1.4.0
 	github.com/transcom/mymove v0.0.0-20200217234508-33d518e6bb13
 	go.uber.org/zap v1.13.0

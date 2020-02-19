@@ -15,7 +15,6 @@ import (
 	"github.com/gobuffalo/pop"
 
 	"github.com/transcom/mymove/pkg/gen/internalmessages"
-	"github.com/transcom/mymove/pkg/unit"
 )
 
 // StringIsNilOrNotBlank validates OptionalString fields, which we represent as *string.
@@ -96,21 +95,6 @@ func (v *OptionalIntIsPositive) IsValid(errors *validate.Errors) {
 	}
 }
 
-// OptionalPoundIsNonNegative adds an error if the Field is less than zero
-type OptionalPoundIsNonNegative struct {
-	Name  string
-	Field *unit.Pound
-}
-
-// IsValid adds an error if the Field is less than zero
-func (v *OptionalPoundIsNonNegative) IsValid(errors *validate.Errors) {
-	if v.Field != nil {
-		if *v.Field < 0 {
-			errors.Add(validators.GenerateKey(v.Name), fmt.Sprintf("%d is less than zero.", *v.Field))
-		}
-	}
-}
-
 // Int64IsPresent validates that an int64 is greater than 0.
 type Int64IsPresent struct {
 	Name  string
@@ -121,19 +105,6 @@ type Int64IsPresent struct {
 func (v *Int64IsPresent) IsValid(errors *validate.Errors) {
 	if v.Field == 0 {
 		errors.Add(validators.GenerateKey(v.Name), fmt.Sprintf("%s can not be blank.", v.Name))
-	}
-}
-
-// DiscountRateIsValid validates that a DiscountRate contains a value between 0 and 1.
-type DiscountRateIsValid struct {
-	Name  string
-	Field unit.DiscountRate
-}
-
-// IsValid adds an error if the value is not between 0 and 1.
-func (v *DiscountRateIsValid) IsValid(errors *validate.Errors) {
-	if v.Field.Float64() < 0 || v.Field.Float64() > 1 {
-		errors.Add(validators.GenerateKey(v.Name), fmt.Sprintf("%s must be between 0.0 and 1.0, got %f", v.Name, v.Field))
 	}
 }
 

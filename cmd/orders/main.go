@@ -11,15 +11,6 @@ import (
 var gitBranch string
 var gitCommit string
 
-func stringSliceContains(stringSlice []string, value string) bool {
-	for _, x := range stringSlice {
-		if value == x {
-			return true
-		}
-	}
-	return false
-}
-
 func main() {
 
 	root := cobra.Command{
@@ -45,6 +36,17 @@ func main() {
 	}
 	initServeFlags(serveCommand.Flags())
 	root.AddCommand(serveCommand)
+
+	migrateCommand := &cobra.Command{
+		Use:           "migrate",
+		Short:         "Runs MilMove orders migrations",
+		Long:          "Runs MilMove orders migrations",
+		RunE:          migrateFunction,
+		SilenceUsage:  true, // not needed
+		SilenceErrors: true, // not needed
+	}
+	initMigrateFlags(migrateCommand.Flags())
+	root.AddCommand(migrateCommand)
 
 	completionCommand := &cobra.Command{
 		Use:   "completion",

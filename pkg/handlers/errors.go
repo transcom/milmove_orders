@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 
@@ -13,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	"github.com/transcom/mymove/pkg/models"
+	"github.com/transcom/milmove_orders/pkg/models"
 )
 
 // SQLErrMessage represents string value to represent generic sql error to avoid leaking implementation details
@@ -41,7 +42,10 @@ func NewValidationErrorsResponse(verrs *validate.Errors) *ValidationErrorsRespon
 // WriteResponse to the client
 func (v *ValidationErrorsResponse) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 	rw.WriteHeader(http.StatusBadRequest)
-	json.NewEncoder(rw).Encode(v)
+	errNewEncoder := json.NewEncoder(rw).Encode(v)
+	if errNewEncoder != nil {
+		log.Panic("Unable to encode and write response")
+	}
 }
 
 // ErrResponse collect errors and error codes
@@ -62,7 +66,10 @@ func newErrResponse(code int, err error) *ErrResponse {
 // WriteResponse to the client
 func (o *ErrResponse) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 	rw.WriteHeader(o.Code)
-	json.NewEncoder(rw).Encode(clientMessage{o.Err.Error()})
+	errNewEncoder := json.NewEncoder(rw).Encode(clientMessage{o.Err.Error()})
+	if errNewEncoder != nil {
+		log.Panic("Unable to encode and write response")
+	}
 }
 
 // ResponseForError logs an error and returns the expected error type
