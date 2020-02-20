@@ -27,8 +27,8 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/objx v0.2.0
-	github.com/stretchr/testify v1.4.0
-	github.com/transcom/mymove v0.0.0-20200217234508-33d518e6bb13
+	github.com/stretchr/testify v1.5.1
+	github.com/transcom/mymove v0.0.0-20200220222858-c8f84b7f774f
 	go.uber.org/zap v1.13.0
 	goji.io v2.0.2+incompatible
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2

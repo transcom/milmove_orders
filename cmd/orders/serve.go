@@ -347,7 +347,7 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		logger.Fatal("Could not instantiate IWS RBS", zap.Error(err))
 	}
-	handlerContext.SetIWSPersonLookup(*rbs)
+	handlerContext.SetIWSPersonLookup(rbs)
 
 	// bare is the base muxer. Not intended to have any middleware attached.
 	bare := goji.NewMux()
