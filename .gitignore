@@ -1,0 +1,33 @@
+# direnv
+.envrc.local
+.envrc.chamber
+
+# testing
+/coverage
+coverage.out
+__snapshots__
+
+# development
+/mnt
+/tmp
+/log
+
+# All compiled binaries
+/bin/
+
+# misc
+.DS_Store
+.idea
+.vscode
+*.swp
+*.sublime-*
+
+schema.sql
+
+*.stamp
+
+# SQLEditor
+*.sqs
+
+# Certs
+*.srl

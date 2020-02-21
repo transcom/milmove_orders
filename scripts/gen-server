@@ -1,0 +1,18 @@
+#! /usr/bin/env bash
+
+set -eu -o pipefail
+
+gendir=./pkg/gen
+
+# Clean out the old generated files
+rm -rf $gendir
+mkdir -p $gendir
+
+# Run each swagger process in the background and wait for them to finish
+./bin/swagger generate server -q -f swagger/orders.yaml -t $gendir --model-package ordersmessages --server-package ordersapi --api-package ordersoperations --exclude-main -A milmove_orders &
+pids[0]=$!
+
+# Wait for all processes to finish
+for pid in ${pids[*]}; do
+  wait $pid
+done
