@@ -3,6 +3,10 @@ CircleCI's
 Dev
 DoD
 HackerOne
+JIRA
+Jira
+LICENSE.txt
+MilMove
 Pre-commit
 U.S.
 aws
@@ -10,6 +14,5 @@ aws-vault-wrappe
 golang
 move.mil
 postgres
+prac-engineering
 yaml
-MilMove
-LICENSE.txt
