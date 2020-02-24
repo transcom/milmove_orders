@@ -1,0 +1,14 @@
+FROM alpine:3.11.3
+
+COPY bin/rds-ca-2019-root.pem /bin/rds-ca-2019-root.pem
+COPY bin/orders /bin/orders
+
+COPY migrations/orders/schema /migrate/schema
+COPY migrations/orders/migrations_manifest.txt /migrate/migrations_manifest.txt
+
+# Install tools needed in container
+RUN apk update && apk add ca-certificates --no-cache
+
+WORKDIR /
+
+ENTRYPOINT ["/bin/orders", "migrate", "-p", "file:///migrate/migrations", "-m", "/migrate/migrations_manifest.txt"]

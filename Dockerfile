@@ -6,8 +6,8 @@ COPY bin/orders /bin/orders
 COPY config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b /config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
 COPY config/tls/dod-sw-ca-54.pem /config/tls/dod-sw-ca-54.pem
 
+COPY config /config
 COPY swagger/* /swagger/
-COPY build /build
 
 ENTRYPOINT ["/bin/orders"]
 

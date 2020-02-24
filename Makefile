@@ -41,6 +41,11 @@ help:  ## Print the help documentation
 # ----- END PREAMBLE -----
 #
 
+.PHONY: dev
+dev:
+	docker-compose build
+	docker-compose run --service-ports --rm --name orders_dev dev bash
+
 #
 # ----- START CHECK TARGETS -----
 #

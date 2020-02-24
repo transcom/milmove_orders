@@ -1,0 +1,24 @@
+# Local Development environment
+FROM trussworks/circleci-docker-primary:latest
+# Base image uses "circleci", to avoid using `sudo` run as root user
+USER root
+
+# install chamber
+ARG CHAMBER_VERSION=2.7.5
+ARG CHAMBER_SHA256SUM=acc9fa8bb3b9548a2494de82241767203a19082f61490b6f8e8c9e79cc1fbf2a
+RUN set -ex && cd ~ \
+  && curl -sSLO https://github.com/segmentio/chamber/releases/download/v${CHAMBER_VERSION}/chamber-v${CHAMBER_VERSION}-linux-amd64 \
+  && [ $(sha256sum chamber-v${CHAMBER_VERSION}-linux-amd64 | cut -f1 -d' ') = ${CHAMBER_SHA256SUM} ] \
+  && chmod 755 chamber-v${CHAMBER_VERSION}-linux-amd64 \
+  && mv chamber-v${CHAMBER_VERSION}-linux-amd64 /usr/local/bin/chamber
+
+# apt-get project dependencies
+RUN set -ex && cd ~ \
+  && apt-get -qq update \
+  && : Install apt packages \
+  && apt-get -qq -y install --no-install-recommends entr postgresql-client \
+  && : Cleanup \
+  && apt-get clean \
+  && rm -vrf /var/lib/apt/lists/*
+
+USER circleci

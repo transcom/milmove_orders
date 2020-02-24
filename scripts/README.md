@@ -16,6 +16,7 @@ environment.
 | `check-go-version` | checks the go version required for the project |
 | `check-gopath` | checks the go path is correct for the project |
 | `check-hosts-file` | Script helps ensure that /etc/hosts has all the correct entries in it |
+| `prereqs` | validate if all prerequisite programs have been installed |
 
 ## AWS Scripts
 
