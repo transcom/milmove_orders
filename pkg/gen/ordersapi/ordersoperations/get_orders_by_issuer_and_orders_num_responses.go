@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	ordersmessages "github.com/transcom/milmove_orders/pkg/gen/ordersmessages"
+	"github.com/transcom/milmove_orders/pkg/gen/ordersmessages"
 )
 
 // GetOrdersByIssuerAndOrdersNumOKCode is the HTTP code returned for type GetOrdersByIssuerAndOrdersNumOK

@@ -16,7 +16,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	ordersmessages "github.com/transcom/milmove_orders/pkg/gen/ordersmessages"
+	"github.com/transcom/milmove_orders/pkg/gen/ordersmessages"
 )
 
 // NewPostRevisionParams creates a new PostRevisionParams object
