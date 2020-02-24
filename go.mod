@@ -12,7 +12,7 @@ require (
 	github.com/go-openapi/strfmt v0.19.4
 	github.com/go-openapi/swag v0.19.7
 	github.com/go-openapi/validate v0.19.6
-	github.com/go-swagger/go-swagger v0.21.0
+	github.com/go-swagger/go-swagger v0.22.0
 	github.com/gobuffalo/envy v1.9.0
 	github.com/gobuffalo/pop v4.13.1+incompatible
 	github.com/gobuffalo/validate v2.0.4+incompatible
@@ -21,7 +21,9 @@ require (
 	github.com/imdario/mergo v0.3.8
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jstemmer/go-junit-report v0.9.1
+	github.com/kr/text v0.2.0 // indirect
 	github.com/lib/pq v1.3.0
+	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v0.0.6
 	github.com/spf13/pflag v1.0.5
@@ -29,9 +31,14 @@ require (
 	github.com/stretchr/objx v0.2.0
 	github.com/stretchr/testify v1.5.1
 	github.com/transcom/mymove v0.0.0-20200220222858-c8f84b7f774f
+	go.mongodb.org/mongo-driver v1.3.0 // indirect
 	go.uber.org/zap v1.14.0
 	goji.io v2.0.2+incompatible
-	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
+	golang.org/x/mod v0.2.0 // indirect
+	golang.org/x/net v0.0.0-20200222125558-5a598a2470a0
+	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect
+	golang.org/x/tools v0.0.0-20200224181240-023911ca70b2 // indirect
+	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
 )
 
 // transcom/sqlx v1.2.1 is just jmoiron's 1.2.0 with custom driver fixes
