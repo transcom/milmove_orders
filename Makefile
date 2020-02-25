@@ -103,7 +103,7 @@ check_log_dir: ## Make sure we have a log directory
 
 .PHONY: server_generate
 server_generate: pkg/gen/ ## Generate golang server code from Swagger files
-pkg/gen/: bin/swagger $(shell find swagger -type f -name *.yaml)
+pkg/gen/: $(shell find swagger -type f -name *.yaml)
 	scripts/gen-server
 
 .PHONY: server_build
