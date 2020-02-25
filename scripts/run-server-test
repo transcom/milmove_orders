@@ -76,4 +76,4 @@ if [[ "${JUNIT:-}" == "1" ]]; then
 fi
 
 # shellcheck disable=SC2086
-DB_NAME="${DB_NAME_TEST}" DB_PORT="${DB_PORT_TEST}" go test -parallel "${parallel}" -count 1 ${verbose_flag} ${coverage_flag} ${short_flag} ${package_list} | tee "${test_output_file}"
+DB_NAME="${DB_NAME_TEST}" DB_PORT="${DB_PORT}" go test -parallel "${parallel}" -count 1 ${verbose_flag} ${coverage_flag} ${short_flag} ${package_list} | tee "${test_output_file}"

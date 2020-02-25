@@ -19,30 +19,28 @@ services:
       - APPLICATION=orders
       - AWS_DEFAULT_REGION=us-west-2
       - DB_DEBUG=1
-      - DB_HOST=localhost
+      - DB_HOST=database
       - DB_NAME=dev_db
       - DB_NAME_DEPLOYED_MIGRATIONS=deployed_migrations
       - DB_NAME_DEV=dev_db
       - DB_NAME_TEST=test_db
       - DB_PASSWORD=mysecretpassword
-      - DB_PORT=7432
-      - DB_PORT_DEPLOYED_MIGRATIONS=7434
-      - DB_PORT_TEST=7433
+      - DB_PORT=5432
       - DB_RETRY_INTERVAL=5s
       - DB_SSL_MODE=disable
       - DB_USER=postgres
       - DEVLOCAL_CA=/app/config/tls/devlocal-ca.pem
-      - DOD_CA_PACKAGE="/app/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b"
+      - DOD_CA_PACKAGE=/app/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
       - ENVIRONMENT=development
       - GIN_PORT=7001
       - GO111MODULE=auto
       - GOLANGCI_LINT_CONCURRENCY=6
-      - GOLANGCI_LINT_VERBOSE=""
+      - GOLANGCI_LINT_VERBOSE=
       - HTTP_ORDERS_SERVER_NAME=orderslocal
       - IWS_RBS_ENABLED=0
-      - IWS_RBS_HOST="pkict.dmdc.osd.mil"
+      - IWS_RBS_HOST=pkict.dmdc.osd.mil
       - MIGRATION_MANIFEST=app/migrations/orders/migrations_manifest.txt
-      - MIGRATION_PATH="file://app/migrations/orders/schema;file://app/migrations/orders/secure"
+      - MIGRATION_PATH=file://app/migrations/orders/schema;file://app/migrations/orders/secure
       - MOVE_MIL_DOD_CA_CERT
       - MOVE_MIL_DOD_TLS_CERT
       - MOVE_MIL_DOD_TLS_KEY

@@ -7,3 +7,18 @@ States. In places where the contributions of U.S. Federal employees are not elig
 the public domain. In places where it is eligible for copyright, such as some foreign jurisdictions, the remainder of
 this work is licensed under [the MIT License](https://opensource.org/licenses/MIT), the full text of which is included
 in the [LICENSE.txt](./LICENSE.txt) file in this repository.
+
+## Development
+
+Development is handled entirely within docker using docker-compose. To enter the development environment run:
+
+```sh
+direnv allow
+make dev
+```
+
+To reset your environment run
+
+```sh
+make dev_destroy dev
+```
