@@ -81,6 +81,4 @@ check-aws-cli-version
 check-aws-vault-version
 check-bash-version
 check-chamber-version
-check-go-version
-check-gopath
 check-hosts-file

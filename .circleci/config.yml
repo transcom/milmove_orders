@@ -117,12 +117,12 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+            - go-mod-sources-v2-{{ checksum "go.sum" }}
       - run:
           name: Install dependencies
           command: for i in $(seq 1 5); do go get ./... && s=0 && break || s=$? && sleep 5; done; (exit $s)
       - save_cache:
-          key: go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+          key: go-mod-sources-v2-{{ checksum "go.sum" }}
           paths:
             - '/go/pkg/mod'
       - announce_failure
@@ -134,12 +134,12 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+            - go-mod-sources-v2-{{ checksum "go.sum" }}
       - run: echo 'export PATH=${PATH}:~/go/bin:~/transcom/milmove_orders/bin' >> $BASH_ENV
       - run: make server_generate
       - run: scripts/check-generated-code
       - save_cache:
-          key: go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+          key: go-mod-sources-v2-{{ checksum "go.sum" }}
           paths:
             - '/go/pkg/mod'
       - announce_failure
@@ -151,7 +151,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}}
+            - go-mod-sources-v2-{{ checksum "go.sum" }}
       - restore_cache:
           keys:
             - pre-commit-dot-cache-{{ checksum ".pre-commit-config.yaml" }}
@@ -188,7 +188,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+            - go-mod-sources-v2-{{ checksum "go.sum" }}
       - run: echo 'export PATH=${PATH}:~/go/bin:~/transcom/milmove_orders/bin' >> $BASH_ENV
       - run: sudo apt-get update && sudo apt-get install -yy postgresql-client
       - run: make bin/go-junit-report
