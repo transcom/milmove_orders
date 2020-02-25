@@ -41,6 +41,7 @@ committing.
 | Script Name | Description |
 | --- | --- |
 | `pre-commit-go-mod` | modify `go.mod` and `go.sum` to match whats in the project |
+| `swagger-validate-docker` | Run swagger validate command inside docker container |
 
 ## CircleCI Scripts
 

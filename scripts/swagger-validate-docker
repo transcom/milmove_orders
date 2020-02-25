@@ -1,0 +1,5 @@
+#! /usr/bin/env bash
+
+set -eu -o pipefail
+
+docker run -v "${PWD}":/app milmove_orders_dev /usr/local/bin/swagger validate "/app/$1"

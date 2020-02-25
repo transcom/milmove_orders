@@ -51,7 +51,7 @@ ensure_pre_commit: .git/hooks/pre-commit ## Ensure pre-commit is installed
 	pre-commit install-hooks
 
 .PHONY: pre_commit_tests
-pre_commit_tests: bin/swagger ## Run pre-commit tests
+pre_commit_tests: ## Run pre-commit tests
 	pre-commit run --all-files
 
 .PHONY: check_hosts
@@ -70,9 +70,6 @@ check_hosts: scripts/check-hosts-file ## Check that hosts are in the /etc/hosts 
 
 bin/gin:
 	go build -ldflags "$(LDFLAGS)" -o bin/gin github.com/codegangsta/gin
-
-bin/swagger:
-	go build -ldflags "$(LDFLAGS)" -o bin/swagger github.com/go-swagger/go-swagger/cmd/swagger
 
 # No static linking / $(LDFLAGS) because go-junit-report is only used for building the CirlceCi test report
 bin/go-junit-report:
