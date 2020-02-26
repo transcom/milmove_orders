@@ -16,16 +16,6 @@ environment.
 | `check-hosts-file` | Script helps ensure that /etc/hosts has all the correct entries in it |
 | `prereqs` | validate if all prerequisite programs have been installed |
 
-## AWS Scripts
-
-These scripts are used for interacting with AWS or secrets in the AWS System Manager Parameter Store
-
-| Script Name | Description |
-| --- | --- |
-| `aws` | Linked to aws-vault-wrapper. Runs the aws binary |
-| `aws-vault-wrapper` | A wrapper to ensure AWS credentials are in the environment |
-| `chamber` | Linked to aws-vault-wrapper. Runs chamber binary |
-
 ## Operations Scripts
 
 These scripts are used to operate the system.
