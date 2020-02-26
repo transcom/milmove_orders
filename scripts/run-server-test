@@ -4,7 +4,7 @@
 # Run golang server tests
 #
 # Set these environment variables to change behavior:
-# - APPLICATION: 'app' or 'orders' will change which tests are run and which migrations are run for them
+# - APPLICATION: 'orders' will change which tests are run and which migrations are run for them
 # - CIRCLECI: Will reduce parallelism and make the test output verbose
 # - COVERAGE: '1' will enable test coverage flags
 # - DRY_RUN: '1' will build the tests but not run them
@@ -76,4 +76,4 @@ if [[ "${JUNIT:-}" == "1" ]]; then
 fi
 
 # shellcheck disable=SC2086
-DB_NAME="${DB_NAME_TEST}" DB_PORT="${DB_PORT_TEST}" go test -parallel "${parallel}" -count 1 ${verbose_flag} ${coverage_flag} ${short_flag} ${package_list} | tee "${test_output_file}"
+DB_NAME="${DB_NAME_TEST}" DB_PORT="${DB_PORT}" go test -parallel "${parallel}" -count 1 ${verbose_flag} ${coverage_flag} ${short_flag} ${package_list} | tee "${test_output_file}"

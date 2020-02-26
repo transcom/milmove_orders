@@ -13,19 +13,8 @@ environment.
 
 | Script Name | Description |
 | --- | --- |
-| `check-go-version` | checks the go version required for the project |
-| `check-gopath` | checks the go path is correct for the project |
 | `check-hosts-file` | Script helps ensure that /etc/hosts has all the correct entries in it |
-
-## AWS Scripts
-
-These scripts are used for interacting with AWS or secrets in the AWS System Manager Parameter Store
-
-| Script Name | Description |
-| --- | --- |
-| `aws` | Linked to aws-vault-wrapper. Runs the aws binary |
-| `aws-vault-wrapper` | A wrapper to ensure AWS credentials are in the environment |
-| `chamber` | Linked to aws-vault-wrapper. Runs chamber binary |
+| `prereqs` | validate if all prerequisite programs have been installed |
 
 ## Operations Scripts
 
@@ -42,6 +31,7 @@ committing.
 | Script Name | Description |
 | --- | --- |
 | `pre-commit-go-mod` | modify `go.mod` and `go.sum` to match whats in the project |
+| `pre-commit-swagger-validate` | Run swagger validate command inside docker container |
 
 ## CircleCI Scripts
 

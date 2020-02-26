@@ -1,12 +1,5 @@
 #documentation - docs/how-to/run-pre-commit-hooks.md
 repos:
-  - repo: local
-    hooks:
-      - id: go-version
-        name: go version
-        entry: scripts/check-go-version
-        language: script
-        types: [go]
 
   - repo: git://github.com/pre-commit/pre-commit-hooks
     rev: v2.5.0
@@ -43,7 +36,7 @@ repos:
     hooks:
       - id: swagger
         name: Swagger
-        entry: bin/swagger validate
+        entry: scripts/pre-commit-swagger-validate
         language: script
         files: swagger/*
         types: [yaml]
