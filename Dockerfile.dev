@@ -3,6 +3,6 @@ FROM milmove/circleci-docker:milmove-orders
 # Base image uses "circleci", to avoid using `sudo` run as root user
 USER root
 
-ENV PATH="/app/bin:/app/scripts:${PATH}"
+ENV PATH="/home/circleci/milmove_orders/bin:/home/circleci/milmove_orders/scripts:${PATH}"
 
 USER circleci

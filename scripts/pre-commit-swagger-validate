@@ -2,9 +2,11 @@
 
 set -eu -o pipefail
 
+filename="/home/circleci/milmove_orders/$1"
+
 UNAME_S=$(uname -s)
 if [ "$UNAME_S" == "Linux" ]; then
-  /usr/local/bin/swagger validate "/app/$1"
+  /usr/local/bin/swagger validate "${filename}"
 else
-  docker run -v "${PWD}":/app milmove_orders_dev /usr/local/bin/swagger validate "/app/$1"
+  docker run -v "${PWD}":/home/circleci/milmove_orders milmove_orders_dev /usr/local/bin/swagger validate "${filename}"
 fi

@@ -29,8 +29,8 @@ services:
       - DB_RETRY_INTERVAL=5s
       - DB_SSL_MODE=disable
       - DB_USER=postgres
-      - DEVLOCAL_CA=/app/config/tls/devlocal-ca.pem
-      - DOD_CA_PACKAGE=/app/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
+      - DEVLOCAL_CA=/home/circleci/milmove_orders/config/tls/devlocal-ca.pem
+      - DOD_CA_PACKAGE=/home/circleci/milmove_orders/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
       - ENVIRONMENT=development
       - GIN_PORT=7001
       - GO111MODULE=auto
@@ -39,8 +39,8 @@ services:
       - HTTP_ORDERS_SERVER_NAME=orderslocal
       - IWS_RBS_ENABLED=0
       - IWS_RBS_HOST=pkict.dmdc.osd.mil
-      - MIGRATION_MANIFEST=app/migrations/orders/migrations_manifest.txt
-      - MIGRATION_PATH=file://app/migrations/orders/schema;file://app/migrations/orders/secure
+      - MIGRATION_MANIFEST=/home/circleci/milmove_orders/migrations/orders/migrations_manifest.txt
+      - MIGRATION_PATH=file://home/circleci/milmove_orders/migrations/orders/schema;file://home/circleci/milmove_orders/migrations/orders/secure
       - MOVE_MIL_DOD_CA_CERT
       - MOVE_MIL_DOD_TLS_CERT
       - MOVE_MIL_DOD_TLS_KEY
@@ -60,5 +60,5 @@ services:
       - '6443:6443'
       - '7443:7443'
     volumes:
-      - ./:/app
-    working_dir: /app
+      - ./:/home/circleci/milmove_orders
+    working_dir: /home/circleci/milmove_orders
