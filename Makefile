@@ -21,8 +21,7 @@ help:  ## Print the help documentation
 
 .PHONY: dev
 dev:
-	docker pull milmove/circleci-docker:milmove-orders
-	docker-compose -f docker-compose.yml build
+	docker-compose -f docker-compose.yml build --pull
 	docker-compose -f docker-compose.yml run --service-ports --rm --name orders_dev dev bash
 
 .PHONY: dev_destroy
