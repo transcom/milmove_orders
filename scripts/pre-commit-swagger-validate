@@ -2,14 +2,9 @@
 
 set -eu -o pipefail
 
-SWAGGER=/usr/local/bin/swagger
-if [ -n "${CIRCLECI+x}" ]; then
-  SWAGGER=bin/swagger
-fi
-
 UNAME_S=$(uname -s)
 if [ "$UNAME_S" == "Linux" ]; then
-  "${SWAGGER}" validate "/app/$1"
+  /usr/local/bin/swagger validate "/app/$1"
 else
-  docker run -v "${PWD}":/app milmove_orders_dev "${SWAGGER}" validate "/app/$1"
+  docker run -v "${PWD}":/app milmove_orders_dev /usr/local/bin/swagger validate "/app/$1"
 fi

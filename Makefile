@@ -21,6 +21,7 @@ help:  ## Print the help documentation
 
 .PHONY: dev
 dev:
+	docker pull milmove/circleci-docker:milmove-orders
 	docker-compose -f docker-compose.yml build
 	docker-compose -f docker-compose.yml run --service-ports --rm --name orders_dev dev bash
 
@@ -70,10 +71,6 @@ check_hosts: scripts/check-hosts-file ## Check that hosts are in the /etc/hosts 
 
 bin/gin:
 	go build -ldflags "$(LDFLAGS)" -o bin/gin github.com/codegangsta/gin
-
-# ONLY USED FOR CIRCLECI, DO NOT USE LOCALLY
-bin/swagger:
-	go build -ldflags "$(LDFLAGS)" -o bin/swagger github.com/go-swagger/go-swagger/cmd/swagger
 
 # No static linking / $(LDFLAGS) because go-junit-report is only used for building the CirlceCi test report
 bin/go-junit-report:

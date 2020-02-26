@@ -2,7 +2,7 @@
 # BUILDER #
 ###########
 
-FROM trussworks/circleci-docker-primary:c3a4d876a5681cceef9f927392732c259308d158 as builder
+FROM milmove/circleci-docker:milmove-orders-3d673da42b5c1bbe3e62815d309217c76315567a as builder
 
 ENV CIRCLECI=true
 

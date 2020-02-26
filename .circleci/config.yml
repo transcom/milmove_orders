@@ -12,23 +12,23 @@
 version: '2.1'
 
 executors:
-  # `milmove_orders_small` and `milmove_orders_medium` use the `trussworks/circleci-docker-primary` docker image with a checkout of the milmove_orders code
+  # `milmove_orders_small` and `milmove_orders_medium` use the `milmove/circleci-docker` docker image with a checkout of the milmove_orders code
   milmove_orders_small:
     resource_class: small
     working_directory: ~/transcom/milmove_orders
     docker:
-      - image: trussworks/circleci-docker-primary:c3a4d876a5681cceef9f927392732c259308d158
+      - image: milmove/circleci-docker:milmove-orders-3d673da42b5c1bbe3e62815d309217c76315567a
   milmove_orders_medium:
     resource_class: medium
     working_directory: ~/transcom/milmove_orders
     docker:
-      - image: trussworks/circleci-docker-primary:c3a4d876a5681cceef9f927392732c259308d158
+      - image: milmove/circleci-docker:milmove-orders-3d673da42b5c1bbe3e62815d309217c76315567a
   # `milmove_orders_and_postgres_medium` adds a secondary postgres container to be used during testing.
   milmove_orders_and_postgres_medium:
     resource_class: medium
     working_directory: ~/transcom/milmove_orders
     docker:
-      - image: trussworks/circleci-docker-primary:c3a4d876a5681cceef9f927392732c259308d158
+      - image: milmove/circleci-docker:milmove-orders-3d673da42b5c1bbe3e62815d309217c76315567a
       - image: postgres:10.10
         environment:
           - POSTGRES_PASSWORD: mysecretpassword
@@ -136,7 +136,6 @@ jobs:
           keys:
             - go-mod-sources-v2-{{ checksum "go.sum" }}
       - run: echo 'export PATH=${PATH}:~/go/bin:~/transcom/milmove_orders/bin' >> $BASH_ENV
-      - run: make bin/swagger
       - run: make server_generate
       - run: scripts/check-generated-code
       - save_cache:
@@ -157,7 +156,6 @@ jobs:
           keys:
             - pre-commit-dot-cache-{{ checksum ".pre-commit-config.yaml" }}
       - run: echo 'export PATH=${PATH}:~/go/bin:~/transcom/milmove_orders/bin' >> $BASH_ENV
-      - run: make bin/swagger
       # this is so we can avoid go mod downloading and resulting in an error on a false positive
       - run: scripts/pre-commit-go-mod || exit 0
       - run:
