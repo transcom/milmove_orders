@@ -9,9 +9,9 @@
 
 # This line grabs any available secrets in orders-devlocal and adds them to the environment.
 # Lines that begin with `require ...` should still run to verify the secret is set.
-if ! chamber list orders-devlocal --retries=1 > /dev/null ; then
+if ! aws-vault exec "${AWS_PROFILE}" -- chamber list orders-devlocal --retries=1 > /dev/null ; then
   log_error "Unable to access orders-devlocal variables with chamber."
   log_error "Login to chamber with 'chamber list orders-devlocal'."
 else
-  eval "$(chamber env orders-devlocal --retries=1)"
+  eval "$(aws-vault exec "${AWS_PROFILE}" -- chamber env orders-devlocal --retries=1)"
 fi

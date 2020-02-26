@@ -1,10 +1,10 @@
 module github.com/transcom/milmove_orders
 
-go 1.13
+go 1.14
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
-	github.com/aws/aws-sdk-go v1.29.8
+	github.com/aws/aws-sdk-go v1.29.9
 	github.com/codegangsta/gin v0.0.0-20171026143024-cafe2ce98974
 	github.com/go-openapi/analysis v0.19.7 // indirect
 	github.com/go-openapi/errors v0.19.3
