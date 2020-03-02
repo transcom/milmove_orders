@@ -10,6 +10,8 @@
 ############
 
 version: '2.1'
+orbs:
+  aws-ecr: circleci/aws-ecr@6.7.0
 
 executors:
   # `milmove_orders_small` and `milmove_orders_medium` use the `milmove/circleci-docker` docker image with a checkout of the milmove_orders code
@@ -45,6 +47,15 @@ commands:
             [[ $CIRCLE_BRANCH = master ]] || exit 0
             scripts/circleci-announce-broken-branch
           when: on_fail
+
+  ecr_describe_image_scan_findings:
+    parameters:
+      repo:
+        type: string
+    steps:
+      - run:
+          name: 'Describe image scan findings'
+          command: scripts/ecr-describe-image-scan-findings << parameters.repo >> ${CIRCLE_SHA1}
 
   server_tests_step:
     parameters:
@@ -201,6 +212,55 @@ jobs:
           path: ~/milmove_orders/tmp/test-results
       - announce_failure
 
+  # `build_orders` builds the application container and pushes to the container repository
+  build_orders:
+    executor: milmove_orders_medium
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - restore_cache:
+          keys:
+            - go-mod-sources-v2-{{ checksum "go.sum" }}
+      - run: make bin/rds-ca-2019-root.pem
+      - run: make bin/orders
+      - aws-ecr/build-and-push-image:
+          account-url: AWS_ECR_ACCOUNT_URL
+          attach-workspace: true
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          checkout: false
+          dockerfile: Dockerfile
+          region: AWS_DEFAULT_REGION
+          repo: orders
+          tag: "git-${CIRCLE_SHA1},git-branch-${CIRCLE_BRANCH//+([^A-Za-z0-9-.])/-}"
+      - ecr_describe_image_scan_findings:
+          repo: orders
+      - announce_failure
+
+  # `build_migrations` builds the migrations container and pushes to the container repository
+  build_migrations:
+    executor: milmove_orders_medium
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run: make bin/rds-ca-2019-root.pem
+      - run: make bin/orders
+      - aws-ecr/build-and-push-image:
+          account-url: AWS_ECR_ACCOUNT_URL
+          attach-workspace: true
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          checkout: false
+          dockerfile: Dockerfile.migrations
+          region: AWS_DEFAULT_REGION
+          repo: orders-migrations
+          tag: "git-${CIRCLE_SHA1},git-branch-${CIRCLE_BRANCH//+([^A-Za-z0-9-.])/-}"
+      - ecr_describe_image_scan_findings:
+          repo: orders-migrations
+      - announce_failure
+
 workflows:
   version: 2
 
@@ -223,3 +283,11 @@ workflows:
           filters:
             branches:
               ignore: placeholder_branch_name
+
+      - build_orders:
+          requires:
+            - pre_deps_golang
+
+      - build_migrations:
+          requires:
+            - pre_deps_golang
