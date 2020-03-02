@@ -231,6 +231,12 @@ jobs:
             - go-mod-sources-v2-{{ checksum "go.sum" }}
       - run: make bin/rds-ca-2019-root.pem
       - run: make bin/orders
+      - run:
+          name: Fix branch name
+          command: |
+            shopt -s extglob
+            echo 'export BRANCH_NAME=${CIRCLE_BRANCH//+([^A-Za-z0-9-.])/-}' >> $BASH_ENV
+            source $BASH_ENV
       - aws-ecr/build-and-push-image:
           account-url: AWS_ECR_ACCOUNT_URL
           attach-workspace: true
@@ -240,7 +246,7 @@ jobs:
           dockerfile: Dockerfile
           region: AWS_DEFAULT_REGION
           repo: orders
-          tag: "git-${CIRCLE_SHA1},git-branch-${CIRCLE_BRANCH//+([^A-Za-z0-9-.])/-}"
+          tag: "git-${CIRCLE_SHA1},git-branch-${BRANCH_NAME}"
       - ecr_describe_image_scan_findings:
           repo: orders
       - announce_failure
@@ -254,6 +260,12 @@ jobs:
           docker_layer_caching: false
       - run: make bin/rds-ca-2019-root.pem
       - run: make bin/orders
+      - run:
+          name: Fix branch name
+          command: |
+            shopt -s extglob
+            echo 'export BRANCH_NAME=${CIRCLE_BRANCH//+([^A-Za-z0-9-.])/-}' >> $BASH_ENV
+            source $BASH_ENV
       - aws-ecr/build-and-push-image:
           account-url: AWS_ECR_ACCOUNT_URL
           attach-workspace: true
@@ -263,7 +275,7 @@ jobs:
           dockerfile: Dockerfile.migrations
           region: AWS_DEFAULT_REGION
           repo: orders-migrations
-          tag: "git-${CIRCLE_SHA1},git-branch-${CIRCLE_BRANCH//+([^A-Za-z0-9-.])/-}"
+          tag: "git-${CIRCLE_SHA1},git-branch-${BRANCH_NAME}"
       - ecr_describe_image_scan_findings:
           repo: orders-migrations
       - announce_failure
