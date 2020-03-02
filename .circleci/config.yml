@@ -12,6 +12,7 @@
 version: '2.1'
 orbs:
   aws-ecr: circleci/aws-ecr@6.7.0
+  slack: circleci/slack@3.4.2
 
 executors:
   # `milmove_orders_small` and `milmove_orders_medium` use the `milmove/circleci-docker` docker image with a checkout of the milmove_orders code
@@ -41,12 +42,18 @@ commands:
   announce_failure:
     parameters:
     steps:
+      - slack/status:
+          fail_only: true
+          failure_message: 'The $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME commit $CIRCLE_SHA1 broke on job $CIRCLE_JOB! Contact $CIRCLE_USERNAME for more information.'
+          only_for_branches: master
+          webhook: ${SLACK_WEBHOOK_URL}
       - run:
-          name: Announce failure
-          command: |
-            [[ $CIRCLE_BRANCH = master ]] || exit 0
-            scripts/circleci-announce-broken-branch
+          name: Announce failure for failed Deploys on master branch to Pager Duty
+          command: scripts/circleci-announce-broken-branch
           when: on_fail
+          filters:
+            branches:
+              only: master
 
   ecr_describe_image_scan_findings:
     parameters:
