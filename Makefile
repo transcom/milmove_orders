@@ -254,7 +254,7 @@ db_test_psql: ## Open PostgreSQL shell for Dev DB
 
 .PHONY: docker_compose_branch_up
 docker_compose_branch_up: ## Bring up docker-compose containers for current branch with AWS ECR images
-	aws-vault exec "${AWS_PROFILE}" -- aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+	aws-vault exec "${AWS_PROFILE}" -- docker run -it -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SECURITY_TOKEN -e AWS_SESSION_TOKEN milmove/circleci-docker:milmove-orders aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
 	scripts/update-docker-compose
 	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.branch.yml up
 
