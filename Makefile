@@ -103,12 +103,9 @@ server_generate: pkg/gen/ ## Generate golang server code from Swagger files
 pkg/gen/: $(shell find swagger -type f -name *.yaml)
 	scripts/gen-server
 
-.PHONY: server_build
-server_build: bin/orders ## Build the server
-
 # This command is for running the server by itself, it will serve the compiled frontend on its own
 # Note: Don't double wrap with aws-vault because the pkg/cli/vault.go will handle it
-server_run_standalone: check_log_dir server_build db_dev_run
+server_run_standalone: check_log_dir bin/orders db_dev_run
 	DEBUG_LOGGING=true ./bin/orders serve 2>&1 | tee -a log/dev.log
 
 # This command will rebuild the swagger go code and rerun server on any changes
@@ -198,8 +195,8 @@ db_dev_run: db_dev_create ## Run Dev DB (start and create)
 .PHONY: db_dev_reset
 db_dev_reset: db_dev_destroy db_dev_run ## Reset Dev DB (destroy and run)
 
-.PHONY: db_dev_migrate_standalone ## Migrate Dev DB directly
-db_dev_migrate_standalone: bin/orders
+.PHONY: db_dev_migrate_standalone
+db_dev_migrate_standalone: bin/orders ## Migrate Dev DB directly
 	@echo "Migrating the ${DB_NAME_DEV} database..."
 	DB_DEBUG=0 bin/orders migrate -p "file://migrations/${APPLICATION}/secure;file://migrations/${APPLICATION}/schema" -m "migrations/${APPLICATION}/migrations_manifest.txt"
 
@@ -235,8 +232,8 @@ db_test_run: db_test_create ## Run Dev DB (start and create)
 .PHONY: db_test_reset
 db_test_reset: db_test_destroy db_test_run ## Reset Dev DB (destroy and run)
 
-.PHONY: db_test_migrate_standalone ## Migrate Dev DB directly
-db_test_migrate_standalone: bin/orders
+.PHONY: db_test_migrate_standalone
+db_test_migrate_standalone: bin/orders ## Migrate Dev DB directly
 	@echo "Migrating the ${DB_NAME_TEST} database..."
 	DB_NAME=${DB_NAME_TEST} DB_DEBUG=0 bin/orders migrate -p "file://migrations/${APPLICATION}/secure;file://migrations/${APPLICATION}/schema" -m "migrations/${APPLICATION}/migrations_manifest.txt"
 
@@ -249,4 +246,25 @@ db_test_psql: ## Open PostgreSQL shell for Dev DB
 
 #
 # ----- END DB_TEST TARGETS -----
+#
+
+#
+# ----- START DOCKER COMPOSE BRANCH TARGETS -----
+#
+
+.PHONY: docker_compose_branch_up
+docker_compose_branch_up: ## Bring up docker-compose containers for current branch with AWS ECR images
+	aws-vault exec "${AWS_PROFILE}" -- docker run -it -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SECURITY_TOKEN -e AWS_SESSION_TOKEN milmove/circleci-docker:milmove-orders aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+	scripts/update-docker-compose
+	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.branch.yml up
+
+.PHONY: docker_compose_branch_down
+docker_compose_branch_down: ## Destroy docker-compose containers for current branch
+	docker-compose -f docker-compose.branch.yml down
+	# Instead of using `--rmi all` which might destroy postgres we just remove the AWS containers
+	docker rmi $(shell docker images --filter=reference='*amazonaws*/*:*' --format "{{.ID}}")
+	git checkout docker-compose.yml
+
+#
+# ----- END DOCKER COMPOSE TARGETS -----
 #

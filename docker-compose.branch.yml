@@ -1,0 +1,85 @@
+version: '3.3'
+
+services:
+  database:
+    image: postgres:10.10
+    restart: always
+    ports:
+      - '7432:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=dev_db
+
+  milmove_migrate:
+    depends_on:
+      - database
+    image: 923914045601.dkr.ecr.us-west-2.amazonaws.com/orders-migrations:git-branch-cg-migrations-2
+    links:
+      - database
+    environment:
+      - DB_ENV=development
+      - DB_HOST=database
+      - DB_NAME=dev_db
+      - DB_PASSWORD=mysecretpassword
+      - DB_PORT=5432
+      - DB_SSL_MODE=disable
+      - DB_USER=postgres
+      - ENVIRONMENT=test
+      - MIGRATION_PATH=file:///migrate/schema;file:///migrate/secure
+      - MIGRATION_MANIFEST=/migrate/migrations_manifest.txt
+    entrypoint:
+      - '/bin/orders'
+      - 'migrate'
+    volumes:
+      - ./migrations/orders/secure:/migrate/secure
+
+  milmove:
+    depends_on:
+      - database
+      - milmove_migrate
+    image: 923914045601.dkr.ecr.us-west-2.amazonaws.com/orders:git-branch-cg-migrations-2
+    links:
+      - database
+    ports:
+      - '6443:6443'
+    environment:
+      - APPLICATION=orders
+      - AWS_ACCESS_KEY_ID
+      - AWS_DEFAULT_REGION=us-west-2
+      - AWS_REGION
+      - AWS_SDK_LOAD_CONFIG
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SECURITY_TOKEN
+      - AWS_SESSION_EXPIRATION
+      - AWS_SESSION_TOKEN
+      - DB_DEBUG=1
+      - DB_ENV=development
+      - DB_HOST=database
+      - DB_NAME=dev_db
+      - DB_PASSWORD=mysecretpassword
+      - DB_PORT=5432
+      - DB_RETRY_INTERVAL=5s
+      - DB_SSL_MODE=disable
+      - DB_USER=postgres
+      - DEVLOCAL_CA=/config/tls/devlocal-ca.pem
+      - DOD_CA_PACKAGE=/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
+      - ENVIRONMENT=test
+      - HTTP_ORDERS_SERVER_NAME=orderslocal
+      - IWS_RBS_ENABLED=0
+      - IWS_RBS_HOST=pkict.dmdc.osd.mil
+      - LOCAL_STORAGE_ROOT=/tmp
+      - LOCAL_STORAGE_WEB_ROOT=storage
+      - MOVE_MIL_DOD_CA_CERT
+      - MOVE_MIL_DOD_TLS_CERT
+      - MOVE_MIL_DOD_TLS_KEY
+      - MUTUAL_TLS_ENABLED=1
+      - MUTUAL_TLS_PORT=7443
+      - NO_TLS_PORT=7080
+      - PGPASSWORD=mysecretpassword
+      - SERVE_ORDERS=true
+      - TLS_ENABLED=false
+      - TLS_PORT=6443
+      - TZ=UTC
+    volumes:
+      - ./tmp:/tmp

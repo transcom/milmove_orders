@@ -205,10 +205,7 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 					}
 				})
 			}
-			err := logger.Sync()
-			if err != nil {
-				logger.Error("error syncing logger", zap.Error(err))
-			}
+			_ = logger.Sync()
 		}
 	}()
 
@@ -525,10 +522,7 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 	}
 
 	// make sure we flush any pending startup messages
-	errLoggerSync := logger.Sync()
-	if errLoggerSync != nil {
-		logger.Error("error syncing logger", zap.Error(errLoggerSync))
-	}
+	_ = logger.Sync()
 
 	// Create a buffered channel that accepts 1 signal at a time.
 	quit := make(chan os.Signal, 1)
@@ -542,10 +536,7 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 	logger.Info("received signal for graceful shutdown of server", zap.Any("signal", sig))
 
 	// flush message that we received signal
-	errLoggerSync = logger.Sync()
-	if errLoggerSync != nil {
-		logger.Error("error syncing logger", zap.Error(errLoggerSync))
-	}
+	_ = logger.Sync()
 
 	gracefulShutdownTimeout := v.GetDuration(cli.GracefulShutdownTimeoutFlag)
 
@@ -555,10 +546,7 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 	logger.Info("Waiting for listeners to be shutdown", zap.Duration("timeout", gracefulShutdownTimeout))
 
 	// flush message that we are waiting on listeners
-	errLoggerSync = logger.Sync()
-	if errLoggerSync != nil {
-		logger.Error("error syncing logger", zap.Error(errLoggerSync))
-	}
+	_ = logger.Sync()
 
 	wg := &sync.WaitGroup{}
 	var shutdownErrors sync.Map
@@ -589,10 +577,7 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 
 	wg.Wait()
 	logger.Info("All listeners are shutdown")
-	errLoggerSync = logger.Sync()
-	if errLoggerSync != nil {
-		logger.Error("error syncing logger", zap.Error(errLoggerSync))
-	}
+	_ = logger.Sync()
 
 	var dbCloseErr error
 	dbClose.Do(func() {
@@ -617,10 +602,7 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 		logger.Error("error closing database connections", zap.Error(dbCloseErr))
 	}
 
-	errLoggerSync = logger.Sync()
-	if errLoggerSync != nil {
-		logger.Error("error syncing logger", zap.Error(errLoggerSync))
-	}
+	_ = logger.Sync()
 
 	if shutdownError {
 		os.Exit(1)
