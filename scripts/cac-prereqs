@@ -1,0 +1,36 @@
+#! /usr/bin/env bash
+
+set -eu -o pipefail
+
+#
+# Check the prereqs for CAC
+#
+# Note: This script has no output other than Exit 0 on success  so it can be used in other scripts.
+#
+
+readonly MODULE=/usr/local/lib/pkcs11/cackey.dylib
+readonly PKCS11=/usr/local/bin/pkcs11-tool
+readonly PKCS15=/usr/local/bin/pkcs15-tool
+
+if [[ ! -x "${PKCS11}" ]]; then
+  echo "${PKCS11} has not been installed"
+  echo "Please install with 'brew install opensc'"
+  exit 1
+fi
+
+if [[ ! -x "${PKCS15}" ]]; then
+  echo "${PKCS15} has not been installed"
+  echo "Please install with 'brew install opensc'"
+  exit 1
+fi
+
+OS_VERSION=$(/usr/bin/sw_vers -productVersion)
+MAC_OS="10.15"
+if [[ $OS_VERSION != *$MAC_OS* && ! -f "${MODULE}" ]]; then
+  echo "${MODULE} must be installed for MacOS versions prior to ${MAC_OS}"
+  echo "Please visit http://militarycac.org/MacVideos.htm#CACKey_packages and follow instructions to install"
+  exit 1
+elif [[ -f "${MODULE}" ]]; then
+  echo "${MODULE} must be removed for MacOS versions equal to or after ${MAC_OS}"
+  exit 1
+fi

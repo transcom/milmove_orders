@@ -85,3 +85,11 @@ repos:
       entry: scripts/find-scripts-missing-in-readme
       language: script
       pass_filenames: false
+
+  - repo: local
+    hooks:
+    - id: spelling-sort
+      name: sort spelling doc
+      entry: /usr/bin/sort -o .spelling .spelling
+      language: script
+      pass_filenames: false

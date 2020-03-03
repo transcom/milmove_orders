@@ -13,4 +13,4 @@ ENTRYPOINT ["/bin/orders"]
 
 CMD ["serve", "--debug-logging"]
 
-EXPOSE 8080
+EXPOSE 8080 8443 9443

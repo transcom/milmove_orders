@@ -1,7 +1,7 @@
 version: '3.3'
 
 #
-# Used for testing docker images built in CircleCI and tagged with a branch name
+# Used for devlopment inside docker, mounting project directory and running psql
 #
 
 services:
@@ -15,37 +15,15 @@ services:
       - POSTGRES_PASSWORD=mysecretpassword
       - POSTGRES_DB=dev_db
 
-  milmove_migrate:
-    depends_on:
-      - database
-    image: 923914045601.dkr.ecr.us-west-2.amazonaws.com/orders-migrations:git-branch-placeholder-name
-    links:
-      - database
-    environment:
-      - DB_ENV=development
-      - DB_HOST=database
-      - DB_NAME=dev_db
-      - DB_PASSWORD=mysecretpassword
-      - DB_PORT=5432
-      - DB_SSL_MODE=disable
-      - DB_USER=postgres
-      - ENVIRONMENT=test
-      - MIGRATION_PATH=file:///migrate/schema;file:///migrate/secure
-      - MIGRATION_MANIFEST=/migrate/migrations_manifest.txt
-    entrypoint:
-      - '/bin/orders'
-      - 'migrate'
-    volumes:
-      - ./migrations/orders/secure:/migrate/secure
-
-  milmove:
-    depends_on:
-      - database
-      - milmove_migrate
-    image: 923914045601.dkr.ecr.us-west-2.amazonaws.com/orders:git-branch-placeholder-name
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     links:
       - database
     ports:
+      - '7001:7001'
+      - '7080:7080'
       - '6443:6443'
       - '7443:7443'
     environment:
@@ -62,17 +40,26 @@ services:
       - DB_ENV=development
       - DB_HOST=database
       - DB_NAME=dev_db
+      - DB_NAME_DEPLOYED_MIGRATIONS=deployed_migrations
+      - DB_NAME_DEV=dev_db
+      - DB_NAME_TEST=test_db
       - DB_PASSWORD=mysecretpassword
       - DB_PORT=5432
       - DB_RETRY_INTERVAL=5s
       - DB_SSL_MODE=disable
       - DB_USER=postgres
-      - DEVLOCAL_CA=/config/tls/devlocal-ca.pem
-      - DOD_CA_PACKAGE=/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
-      - ENVIRONMENT=test
+      - DEVLOCAL_CA=/home/circleci/milmove_orders/config/tls/devlocal-ca.pem
+      - DOD_CA_PACKAGE=/home/circleci/milmove_orders/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
+      - ENVIRONMENT=development
+      - GIN_PORT=7001
+      - GO111MODULE=auto
+      - GOLANGCI_LINT_CONCURRENCY=6
+      - GOLANGCI_LINT_VERBOSE=
       - HTTP_ORDERS_SERVER_NAME=orderslocal
       - IWS_RBS_ENABLED=0
       - IWS_RBS_HOST=pkict.dmdc.osd.mil
+      - MIGRATION_MANIFEST=/home/circleci/milmove_orders/migrations/orders/migrations_manifest.txt
+      - MIGRATION_PATH=file://home/circleci/milmove_orders/migrations/orders/schema;file://home/circleci/milmove_orders/migrations/orders/secure
       - MOVE_MIL_DOD_CA_CERT
       - MOVE_MIL_DOD_TLS_CERT
       - MOVE_MIL_DOD_TLS_KEY
@@ -86,4 +73,5 @@ services:
       - TLS_PORT=6443
       - TZ=UTC
     volumes:
-      - ./tmp:/tmp
+      - ./:/home/circleci/milmove_orders
+    working_dir: /home/circleci/milmove_orders
