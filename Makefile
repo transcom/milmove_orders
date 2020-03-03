@@ -126,6 +126,39 @@ server_run_default: check_log_dir bin/gin server_generate db_dev_run
 		serve \
 		2>&1 | tee -a log/dev.log
 
+# acceptance_test runs a few acceptance tests against a local or remote environment.
+# This can help identify potential errors before deploying a container.
+.PHONY: acceptance_test
+acceptance_test: bin/rds-ca-2019-root.pem ## Run acceptance tests
+ifndef TEST_ACC_ENV
+	@echo "Running acceptance tests for webserver using local environment."
+	@echo "* Use environment XYZ by setting environment variable to TEST_ACC_ENV=XYZ."
+	TEST_ACC_CWD=$(PWD) \
+	SERVE_ADMIN=true \
+	SERVE_SDDC=true \
+	SERVE_ORDERS=true \
+	SERVE_DPS=true \
+	SERVE_API_INTERNAL=true \
+	SERVE_API_GHC=false \
+	MUTUAL_TLS_ENABLED=true \
+	go test -v -count 1 -short $$(go list ./... | grep \\/cmd\\/orders)
+else
+ifndef CIRCLECI
+	@echo "Running acceptance tests for webserver with environment $$TEST_ACC_ENV."
+	TEST_ACC_CWD=$(PWD) \
+	DISABLE_AWS_VAULT_WRAPPER=1 \
+	aws-vault exec $(AWS_PROFILE) -- \
+	chamber -r $(CHAMBER_RETRIES) exec app-$(TEST_ACC_ENV) -- \
+	go test -v -count 1 -short $$(go list ./... | grep \\/cmd\\/orders)
+else
+	go build -ldflags "$(LDFLAGS)" -o bin/chamber github.com/segmentio/chamber/v2
+	@echo "Running acceptance tests for webserver with environment $$TEST_ACC_ENV."
+	TEST_ACC_CWD=$(PWD) \
+	bin/chamber -r $(CHAMBER_RETRIES) exec app-$(TEST_ACC_ENV) -- \
+	go test -v -count 1 -short $$(go list ./... | grep \\/cmd\\/orders)
+endif
+endif
+
 #
 # ----- END SERVER TARGETS -----
 #

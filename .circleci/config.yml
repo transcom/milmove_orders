@@ -198,6 +198,34 @@ jobs:
           destination: test-results
       - announce_failure
 
+  # `acceptance_tests_local` runs acceptance tests for the webserver against a local environment.
+  acceptance_tests_local:
+    executor: milmove_orders_medium
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-sources-v2-{{ checksum "go.sum" }}
+      - run:
+          name: Run acceptance tests
+          command: |
+            echo 'export MOVE_MIL_DOD_CA_CERT=$(cat /home/circleci/milmove_orders/config/tls/devlocal-ca.pem)' >> $BASH_ENV
+            echo 'export MOVE_MIL_DOD_TLS_CERT=$(cat /home/circleci/milmove_orders/config/tls/devlocal-https.pem)' >> $BASH_ENV
+            echo 'export MOVE_MIL_DOD_TLS_KEY=$(cat /home/circleci/milmove_orders/config/tls/devlocal-https.key)' >> $BASH_ENV
+            source $BASH_ENV
+            make acceptance_test
+          environment:
+            DB_RETRY_INTERVAL: 5s
+            DEVLOCAL_CA: /home/circleci/milmove_orders/config/tls/devlocal-ca.pem
+            DOD_CA_PACKAGE: /home/circleci/milmove_orders/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
+            ENV: test
+            ENVIRONMENT: test
+            MIGRATION_MANIFEST: '/home/circleci/milmove_orders/migrations/orders/migrations_manifest.txt'
+            MIGRATION_PATH: 'file:///home/circleci/milmove_orders/migrations/orders/schema;file:///home/circleci/milmove_orders/migrations/orders/secure'
+            MUTUAL_TLS_ENABLED: true
+            PWD: /home/circleci/milmove_orders
+      - announce_failure
+
   # `server_test` runs the server side Go tests
   server_test:
     executor: milmove_orders_and_postgres_medium
@@ -297,6 +325,10 @@ workflows:
           requires:
             - pre_deps_golang
 
+      - acceptance_tests_local:
+          requires:
+            - pre_deps_golang
+
       - server_test:
           requires:
             - pre_deps_golang
@@ -308,6 +340,7 @@ workflows:
       - build_orders:
           requires:
             - pre_deps_golang
+            - acceptance_tests_local # don't bother building and pushing the application if it won't even start properly
 
       - build_migrations:
           requires:
