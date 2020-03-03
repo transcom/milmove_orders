@@ -210,8 +210,8 @@ jobs:
           name: Run acceptance tests
           command: |
             echo 'export MOVE_MIL_DOD_CA_CERT=$(cat /home/circleci/milmove_orders/config/tls/devlocal-ca.pem)' >> $BASH_ENV
-            echo 'export MOVE_MIL_DOD_TLS_CERT=$(cat /home/circleci/milmove_orders/config/tls/devlocal-https.pem)' >> $BASH_ENV
-            echo 'export MOVE_MIL_DOD_TLS_KEY=$(cat /home/circleci/milmove_orders/config/tls/devlocal-https.key)' >> $BASH_ENV
+            echo 'export MOVE_MIL_DOD_TLS_CERT=$(cat /home/circleci/milmove_orders/config/tls/devlocal-mtls.cer)' >> $BASH_ENV
+            echo 'export MOVE_MIL_DOD_TLS_KEY=$(cat /home/circleci/milmove_orders/config/tls/devlocal-mtls.key)' >> $BASH_ENV
             source $BASH_ENV
             make acceptance_test
           environment:
