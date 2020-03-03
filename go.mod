@@ -3,10 +3,8 @@ module github.com/transcom/milmove_orders
 go 1.14
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
 	github.com/aws/aws-sdk-go v1.29.15
 	github.com/codegangsta/gin v0.0.0-20171026143024-cafe2ce98974
-	github.com/go-openapi/analysis v0.19.7 // indirect
 	github.com/go-openapi/errors v0.19.3
 	github.com/go-openapi/loads v0.19.5
 	github.com/go-openapi/runtime v0.19.11
@@ -25,7 +23,6 @@ require (
 	github.com/jstemmer/go-junit-report v0.9.1
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lib/pq v1.3.0
-	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cast v1.3.1 // indirect
@@ -35,12 +32,11 @@ require (
 	github.com/stretchr/objx v0.2.0
 	github.com/stretchr/testify v1.5.1
 	github.com/transcom/mymove v0.0.0-20200220222858-c8f84b7f774f
-	go.mongodb.org/mongo-driver v1.3.0 // indirect
 	go.uber.org/zap v1.14.0
 	goji.io v2.0.2+incompatible
 	golang.org/x/crypto v0.0.0-20200128174031-69ecbb4d6d5d // indirect
 	golang.org/x/mod v0.2.0 // indirect
-	golang.org/x/net v0.0.0-20200222125558-5a598a2470a0
+	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
 	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect
 	golang.org/x/tools v0.0.0-20200224181240-023911ca70b2 // indirect
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
