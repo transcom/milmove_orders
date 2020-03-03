@@ -51,6 +51,7 @@ application testing
 
 | Script Name | Description |
 | --- | --- |
+| `update-docker-compose` | Update branch name before running docker-compose |
 
 ### Building
 

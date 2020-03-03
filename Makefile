@@ -247,3 +247,24 @@ db_test_psql: ## Open PostgreSQL shell for Dev DB
 #
 # ----- END DB_TEST TARGETS -----
 #
+
+#
+# ----- START DOCKER COMPOSE BRANCH TARGETS -----
+#
+
+.PHONY: docker_compose_branch_up
+docker_compose_branch_up: ## Bring up docker-compose containers for current branch with AWS ECR images
+	aws-vault exec "${AWS_PROFILE}" -- aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+	scripts/update-docker-compose
+	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.branch.yml up
+
+.PHONY: docker_compose_branch_down
+docker_compose_branch_down: ## Destroy docker-compose containers for current branch
+	docker-compose -f docker-compose.branch.yml down
+	# Instead of using `--rmi all` which might destroy postgres we just remove the AWS containers
+	docker rmi $(shell docker images --filter=reference='*amazonaws*/*:*' --format "{{.ID}}")
+	git checkout docker-compose.yml
+
+#
+# ----- END DOCKER COMPOSE TARGETS -----
+#
