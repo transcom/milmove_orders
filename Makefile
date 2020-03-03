@@ -21,12 +21,12 @@ help:  ## Print the help documentation
 
 .PHONY: dev
 dev:
-	docker-compose -f docker-compose.yml build --pull
-	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.yml run --service-ports --rm --name orders_dev dev bash
+	docker-compose -f docker-compose.dev.yml build --pull
+	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.dev.yml run --service-ports --rm --name orders_dev dev bash
 
 .PHONY: dev_destroy
 dev_destroy:
-	docker-compose -f docker-compose.yml down
+	docker-compose -f docker-compose.dev.yml down
 
 .PHONY: clean
 clean: ## Clean all generated files
@@ -126,6 +126,39 @@ server_run_default: check_log_dir bin/gin server_generate db_dev_run
 		serve \
 		2>&1 | tee -a log/dev.log
 
+# acceptance_test runs a few acceptance tests against a local or remote environment.
+# This can help identify potential errors before deploying a container.
+.PHONY: acceptance_test
+acceptance_test: bin/rds-ca-2019-root.pem ## Run acceptance tests
+ifndef TEST_ACC_ENV
+	@echo "Running acceptance tests for webserver using local environment."
+	@echo "* Use environment XYZ by setting environment variable to TEST_ACC_ENV=XYZ."
+	TEST_ACC_CWD=$(PWD) \
+	SERVE_ADMIN=true \
+	SERVE_SDDC=true \
+	SERVE_ORDERS=true \
+	SERVE_DPS=true \
+	SERVE_API_INTERNAL=true \
+	SERVE_API_GHC=false \
+	MUTUAL_TLS_ENABLED=true \
+	go test -v -count 1 -short $$(go list ./... | grep \\/cmd\\/orders)
+else
+ifndef CIRCLECI
+	@echo "Running acceptance tests for webserver with environment $$TEST_ACC_ENV."
+	TEST_ACC_CWD=$(PWD) \
+	DISABLE_AWS_VAULT_WRAPPER=1 \
+	aws-vault exec $(AWS_PROFILE) -- \
+	chamber -r $(CHAMBER_RETRIES) exec app-$(TEST_ACC_ENV) -- \
+	go test -v -count 1 -short $$(go list ./... | grep \\/cmd\\/orders)
+else
+	go build -ldflags "$(LDFLAGS)" -o bin/chamber github.com/segmentio/chamber/v2
+	@echo "Running acceptance tests for webserver with environment $$TEST_ACC_ENV."
+	TEST_ACC_CWD=$(PWD) \
+	bin/chamber -r $(CHAMBER_RETRIES) exec app-$(TEST_ACC_ENV) -- \
+	go test -v -count 1 -short $$(go list ./... | grep \\/cmd\\/orders)
+endif
+endif
+
 #
 # ----- END SERVER TARGETS -----
 #
@@ -161,14 +194,6 @@ server_test_coverage_generate_standalone: ## Run server unit tests with coverage
 .PHONY: server_test_coverage
 server_test_coverage: db_test_reset db_test_migrate server_test_coverage_generate ## Run server unit test coverage with html output
 	DB_PORT=$(DB_PORT_TEST) go tool cover -html=coverage.out
-
-.PHONY: server_test_docker
-server_test_docker:
-	docker-compose -f docker-compose.circle.yml --compatibility up --remove-orphans --abort-on-container-exit
-
-.PHONY: server_test_docker_down
-server_test_docker_down:
-	docker-compose -f docker-compose.circle.yml --compatibility down
 
 #
 # ----- END SERVER TEST TARGETS -----
@@ -256,7 +281,7 @@ db_test_psql: ## Open PostgreSQL shell for Dev DB
 docker_compose_branch_up: ## Bring up docker-compose containers for current branch with AWS ECR images
 	aws-vault exec "${AWS_PROFILE}" -- docker run -it -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SECURITY_TOKEN -e AWS_SESSION_TOKEN milmove/circleci-docker:milmove-orders aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
 	scripts/update-docker-compose
-	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.branch.yml up
+	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.branch.yml up --remove-orphans
 
 .PHONY: docker_compose_branch_down
 docker_compose_branch_down: ## Destroy docker-compose containers for current branch
@@ -264,6 +289,14 @@ docker_compose_branch_down: ## Destroy docker-compose containers for current bra
 	# Instead of using `--rmi all` which might destroy postgres we just remove the AWS containers
 	docker rmi $(shell docker images --filter=reference='*amazonaws*/*:*' --format "{{.ID}}")
 	git checkout docker-compose.yml
+
+.PHONY: docker_compose_local_up
+docker_compose_local_up: ## Bring up docker-compose containers for current local with AWS ECR images
+	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.local.yml up --remove-orphans
+
+.PHONY: docker_compose_local_down
+docker_compose_local_down: ## Destroy docker-compose containers for current local
+	docker-compose -f docker-compose.local.yml down --rmi local
 
 #
 # ----- END DOCKER COMPOSE TARGETS -----

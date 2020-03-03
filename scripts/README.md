@@ -13,6 +13,7 @@ environment.
 
 | Script Name | Description |
 | --- | --- |
+| `check-aws-vault-version` | checks the aws-vault version required for the project |
 | `check-hosts-file` | Script helps ensure that /etc/hosts has all the correct entries in it |
 | `prereqs` | validate if all prerequisite programs have been installed |
 
@@ -98,6 +99,7 @@ These scripts are primarily used for working with a CAC and the Orders API
 
 | Script Name | Description |
 | --- | --- |
+| `cac-prereqs` | Check the prereqs for CAC |
 
 ### Mutual TLS
 

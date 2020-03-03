@@ -33,30 +33,24 @@ function has() {
     fi
 }
 
-has aws "brew install awscli"
-has bash "brew install bash"
-has chamber "brew install chamber"
-has docker "Get Docker CE for Mac from https://download.docker.com/mac/stable/Docker.dmg"
-has jq "brew install jq"
-has go "brew install go"
-has pre-commit "brew install pre-commit"
-has shellcheck "brew install shellcheck"
-has psql "brew install postgresql"
-
 # not on CircleCI
 if [[ -z ${CIRCLECI-} ]]; then
-  # CAC tools
+  # Everything in this project runs with docker
+  has docker "Get Docker CE for Mac from https://download.docker.com/mac/stable/Docker.dmg"
+
+  # Direnv sets up environment, primarily to get secrets from Chamber
+  has direnv "brew install direnv"
+  # Pre-commit needed locally for committing to github
+  has pre-commit "brew install pre-commit"
+
+  # CAC tools used for talking to Smart Card
   has pkcs11-tool "brew install opensc; chmod go+w /usr/local/bin/pkcs11-tool; brew link opensc"
   has pkcs15-tool "brew install opensc; chmod go+w /usr/local/bin/pkcs15-tool; brew link opensc"
 
-  has circleci "brew install circleci"
-  has direnv "brew install direnv"
-  has entr "brew install entr"
-
+  # Vault stores AWS credentials securely
   if [[ $(uname -s) = Darwin ]]; then
     # macOS only
     has aws-vault "brew cask install aws-vault"
-    has watchman "brew install watchman"
   else
     # Linux
     has aws-vault "brew install aws-vault"
@@ -77,8 +71,5 @@ cac-prereqs
 
 # Now check versions are correct for prereqs
 echo
-check-aws-cli-version
 check-aws-vault-version
-check-bash-version
-check-chamber-version
 check-hosts-file

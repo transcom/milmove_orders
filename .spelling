@@ -5,6 +5,7 @@ DoD
 HackerOne
 JIRA
 Jira
+Keychain
 LICENSE.txt
 MilMove
 Pre-commit
@@ -12,7 +13,11 @@ U.S.
 aws
 aws-vault-wrappe
 golang
+macOS
 move.mil
 postgres
 prac-engineering
+prereqs
+repos
+versioning
 yaml
