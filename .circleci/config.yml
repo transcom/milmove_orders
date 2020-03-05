@@ -354,6 +354,10 @@ workflows:
           requires:
             - pre_deps_golang
 
+      - acceptance_tests_experimental:
+          requires:
+            - pre_deps_golang
+
       - server_test:
           requires:
             - pre_deps_golang
