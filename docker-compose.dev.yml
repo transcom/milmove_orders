@@ -36,6 +36,7 @@ services:
       - AWS_SECURITY_TOKEN
       - AWS_SESSION_EXPIRATION
       - AWS_SESSION_TOKEN
+      - CHAMBER_RETRIES=20
       - DB_DEBUG=1
       - DB_ENV=development
       - DB_HOST=database
@@ -45,6 +46,7 @@ services:
       - DB_NAME_TEST=test_db
       - DB_PASSWORD=mysecretpassword
       - DB_PORT=5432
+      - DB_REGION=us-west-2
       - DB_RETRY_INTERVAL=5s
       - DB_SSL_MODE=disable
       - DB_USER=postgres

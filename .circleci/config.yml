@@ -310,6 +310,31 @@ jobs:
           repo: orders-migrations
       - announce_failure
 
+
+  # `acceptance_tests_experimental` runs acceptance tests for the webserver against the experimental environment.
+  acceptance_tests_experimental:
+    executor: milmove_orders_medium
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+      - run:
+          name: Run acceptance tests
+          command: make acceptance_test
+          environment:
+            CHAMBER_RETRIES: 20
+            DB_REGION: us-west-2
+            DB_RETRY_INTERVAL: 5s
+            DEVLOCAL_CA: /home/circleci/transcom/mymove/config/tls/devlocal-ca.pem
+            DOD_CA_PACKAGE: /home/circleci/transcom/mymove/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
+            ENV: test
+            ENVIRONMENT: experimental
+            MUTUAL_TLS_ENABLED: true
+            PWD: /home/circleci/milmove_orders
+            TEST_ACC_ENV: experimental
+      - announce_failure
+
 workflows:
   version: 2
 
@@ -326,6 +351,10 @@ workflows:
             - pre_deps_golang
 
       - acceptance_tests_local:
+          requires:
+            - pre_deps_golang
+
+      - acceptance_tests_experimental:
           requires:
             - pre_deps_golang
 

@@ -84,7 +84,7 @@ bin/rds-ca-2019-root.pem:
 ### Orders Targets
 
 bin/orders:
-	go build -gcflags="$(GOLAND_GC_FLAGS) $(GC_FLAGS)" -asmflags=-trimpath=$(GOPATH) -ldflags "$(LDFLAGS) $(WEBSERVER_LDFLAGS)" -o bin/orders ./cmd/orders
+	go build -gcflags="$(GC_FLAGS)" -asmflags=-trimpath=$(GOPATH) -ldflags "$(LDFLAGS) $(WEBSERVER_LDFLAGS)" -o bin/orders ./cmd/orders
 
 #
 # ----- END BIN TARGETS -----
@@ -143,20 +143,10 @@ ifndef TEST_ACC_ENV
 	MUTUAL_TLS_ENABLED=true \
 	go test -v -count 1 -short $$(go list ./... | grep \\/cmd\\/orders)
 else
-ifndef CIRCLECI
 	@echo "Running acceptance tests for webserver with environment $$TEST_ACC_ENV."
 	TEST_ACC_CWD=$(PWD) \
-	DISABLE_AWS_VAULT_WRAPPER=1 \
-	aws-vault exec $(AWS_PROFILE) -- \
-	chamber -r $(CHAMBER_RETRIES) exec app-$(TEST_ACC_ENV) -- \
+	chamber -r $(CHAMBER_RETRIES) exec orders-$(TEST_ACC_ENV) -- \
 	go test -v -count 1 -short $$(go list ./... | grep \\/cmd\\/orders)
-else
-	go build -ldflags "$(LDFLAGS)" -o bin/chamber github.com/segmentio/chamber/v2
-	@echo "Running acceptance tests for webserver with environment $$TEST_ACC_ENV."
-	TEST_ACC_CWD=$(PWD) \
-	bin/chamber -r $(CHAMBER_RETRIES) exec app-$(TEST_ACC_ENV) -- \
-	go test -v -count 1 -short $$(go list ./... | grep \\/cmd\\/orders)
-endif
 endif
 
 #

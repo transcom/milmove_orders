@@ -121,7 +121,7 @@ func (suite *webServerSuite) patchContext(ctx map[string]string) map[string]stri
 		}
 		// Overwrite the migration path to something on the local system
 		if k == "MIGRATION_PATH" {
-			ctx[k] = "file:///home/circleci/transcom/milmove_orders/migrations/orders/schema;file:///home/circleci/transcom/milmove_orders/migrations/orders/secure"
+			ctx[k] = "file:///home/circleci/milmove_orders/migrations/orders/schema;file:///home/circleci/milmove_orders/migrations/orders/secure"
 		}
 	}
 	return ctx
