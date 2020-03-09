@@ -23,6 +23,7 @@ These scripts are used to operate the system.
 
 | Script Name | Description |
 | --- | --- |
+| `deploy-orders-migrations` | Deploy the orders migrations |
 
 ## Pre-commit Scripts
 
