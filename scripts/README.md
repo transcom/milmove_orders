@@ -44,6 +44,8 @@ These scripts are primarily used for CircleCI workflows.
 | `circleci-announce-broken-branch` | announce that a branch is broken |
 | `do-exclusively` | CircleCI's current recommendation for roughly serializing a subset of build commands for a given branch |
 | `ecr-describe-image-scan-findings` | Checks an uploaded image scan results |
+| `ecs-run-orders-migrations-container` | Creates and runs a migration task using the given container definition. |
+| `rds-snapshot-orders-db` | Creates a snapshot of the orders database for the given environment. |
 
 ## Development Scripts
 
