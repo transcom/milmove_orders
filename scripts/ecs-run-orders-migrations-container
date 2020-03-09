@@ -61,7 +61,7 @@ task_definition_arn=$("${DIR}/../bin/ecs-deploy" task-def \
   --environment "${environment}" \
   --image "${image}" \
   --variables-file "${DIR}/../config/env/${environment}.migrations.env" \
-  --entrypoint "/bin/milmove migrate" \
+  --entrypoint "/bin/orders migrate" \
   --cpu "${RESERVATION_CPU}" \
   --memory "${RESERVATION_MEM}" \
   --register)
