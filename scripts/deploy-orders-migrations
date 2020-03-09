@@ -1,0 +1,51 @@
+#! /usr/bin/env bash
+
+set -eu -o pipefail
+
+#
+# Deploy the orders migrations
+#
+
+usage() {
+  echo "$0 <environment>"
+  exit 1
+}
+
+readonly environment="${1:-experimental}"
+readonly CIRCLE_SHA1="${2:-}"
+
+[[ -z "${environment}" ]] && usage
+
+case "${environment}" in
+  experimental)
+    compare_host=orders.experimental.move.mil
+    ;;
+  staging)
+    compare_host=orders.staging.move.mil
+    ;;
+  prod)
+    compare_host=orders.move.mil
+    ;;
+  *)
+    echo "<environment> must be one of experimental, staging, or prod"
+    exit 1
+    ;;
+esac
+
+if [ -z "${AWS_ACCOUNT_ID}" ]; then
+  echo "AWS_ACCOUNT_ID not found!"
+  echo "Please add 'AWS_ACCOUNT_ID' to your .envrc.local"
+  exit 1
+fi
+
+APP_ENVIRONMENT="${environment}"
+AWS_DEFAULT_REGION=us-west-2
+
+if [ -z "${CIRCLE_SHA1}" ]; then
+  CIRCLE_SHA1=$(curl -s "https://${compare_host}/health" | jq -r .gitCommit)
+
+  scripts/compare-deployed-commit "${compare_host}" "${CIRCLE_SHA1}"
+fi
+
+readonly image="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/orders-migrations:git-${CIRCLE_SHA1}"
+scripts/ecs-run-orders-migrations-container "${image}" "${APP_ENVIRONMENT}"

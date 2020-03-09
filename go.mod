@@ -18,6 +18,7 @@ require (
 	github.com/gofrs/flock v0.7.1
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang/protobuf v1.3.3 // indirect
+	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/imdario/mergo v0.3.8
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jstemmer/go-junit-report v0.9.1
@@ -27,14 +28,14 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/cobra v0.0.6
+	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/objx v0.2.0
 	github.com/stretchr/testify v1.5.1
-	github.com/transcom/mymove v0.0.0-20200220222858-c8f84b7f774f
+	github.com/transcom/mymove v0.0.0-20200309214821-4487b8acafd3
 	go.uber.org/zap v1.14.0
 	goji.io v2.0.2+incompatible
-	golang.org/x/crypto v0.0.0-20200128174031-69ecbb4d6d5d // indirect
 	golang.org/x/mod v0.2.0 // indirect
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
 	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect

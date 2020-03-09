@@ -83,6 +83,9 @@ bin/rds-ca-2019-root.pem:
 
 ### Orders Targets
 
+bin/ecs-deploy:
+	go build -ldflags "$(LDFLAGS)" -o bin/ecs-deploy github.com/transcom/mymove/cmd/ecs-deploy
+
 bin/orders:
 	go build -gcflags="$(GC_FLAGS)" -asmflags=-trimpath=$(GOPATH) -ldflags "$(LDFLAGS) $(WEBSERVER_LDFLAGS)" -o bin/orders ./cmd/orders
 
