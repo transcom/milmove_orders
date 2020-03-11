@@ -9,7 +9,8 @@ set -eu -o pipefail
 readonly aws_command="aws"
 # Environments to upload production migrations to
 # shellcheck disable=SC2206
-readonly environments=(${ENVIRONMENTS:-experimental staging prod})
+# TODO: Add back 'prod staging' to environments
+readonly environments=(${ENVIRONMENTS:-experimental})
 readonly application=orders
 readonly aws_bucket_prefix="transcom-ppp-${application}-"
 readonly aws_bucket_suffix="-us-west-2"
