@@ -1,0 +1,123 @@
+#! /usr/bin/env bash
+#
+# A script to upload secure migrations to all environments
+# https://github.com/transcom/mymove#secure-migrations
+#
+
+set -eu -o pipefail
+
+readonly aws_command="aws"
+# Environments to upload production migrations to
+# shellcheck disable=SC2206
+readonly environments=(${ENVIRONMENTS:-experimental staging prod})
+readonly application=orders
+readonly aws_bucket_prefix="transcom-ppp-${application}-"
+readonly aws_bucket_suffix="-us-west-2"
+readonly aws_path_prefix="secure-migrations"
+
+readonly usage="usage: $0 <production_migration_file>"
+
+function proceed() {
+  proceed_message=${1:-"proceed"}
+  echo -en "\e[31m${proceed_message} (y/N) \e[39m"
+  read -r proceed
+  if [[ "$proceed" =~ ^[^yY]*$ ]]; then
+    echo "exiting"
+    exit 0
+  fi
+}
+
+function run() {
+  command=( "$@" )
+  echo "...executing: ${command[*]}"
+  ${command[*]} &> /dev/null || (echo "Failed!!" && exit 1)
+}
+
+#
+# Pre-flight checks
+#
+
+if [[ -z "${1:-}" ]]; then
+  echo "$usage"
+  exit 1
+elif [[ ! -f "${1}" ]]; then
+  echo "error: unable to find migration file: ${1}"
+  exit 1
+fi
+readonly production_migration_file="$1"
+
+# Migration files need to have the suffix ".up.sql"
+if [[ "${production_migration_file#*.}" != "up.sql" ]]; then
+  echo "error: migration filename extensions must be '.up.sql'"
+  exit 1
+fi
+
+# Ensure the file is below the limit for upload of 250MB for anti-virus
+# Files larger than this size will not scan and thus will not be available for streaming download
+# to the migration container.
+if [ "$(uname -s)" == "Darwin" ]; then
+  FILESIZE=$(/usr/bin/stat -f"%z" "${production_migration_file}")
+else
+  FILESIZE=$(/usr/bin/stat -c"%s" "${production_migration_file}")
+fi
+# 250MB in bytes
+BYTES_IN_MB=1048576
+MAX_FILESIZE=$((250 * "${BYTES_IN_MB}" ))
+if [[ ${FILESIZE} -gt ${MAX_FILESIZE} ]]; then
+  FILESIZE_MB=$(( "${FILESIZE}" / "${BYTES_IN_MB}" ))
+  echo "error: Max file size for upload is 250 MB, this file is too large for anti-virus to work."
+  echo "Your file is ${FILESIZE_MB} MB, please reduce or split before uploading."
+  exit 1
+fi
+
+# Test AWS command and freshen AWS session token
+${aws_command} s3 ls "${aws_bucket_prefix}${environments[0]}${aws_bucket_suffix}" > /dev/null
+
+#
+# Test local secure migration
+#
+
+echo "Testing migrations ... (This could be several minutes!)"
+
+make db_deployed_migrations_reset
+
+MIGRATION_PATH="file://migrations/${application}/schema;file://migrations/${application}/secure" \
+  DB_HOST="${DB_HOST}" \
+  DB_PORT="${DB_PORT}" \
+  DB_NAME="${DB_NAME_DEPLOYED_MIGRATIONS}" \
+	DB_DEBUG=0 \
+  bin/orders migrate
+
+echo "Testing migrations was successful!"
+echo
+
+#
+# Upload secure migration
+#
+
+echo "The file ${production_migration_file} will be uploaded to these locations in s3:"
+for environment in "${environments[@]}"; do
+  echo -e "\ts3://${aws_bucket_prefix}${environment}${aws_bucket_suffix}/${aws_path_prefix}/"
+done
+
+proceed "Are you ready to upload the migrations? This will overwrite files of the same name in S3."
+
+for environment in "${environments[@]}"; do
+  echo "Uploading to: $environment"
+  sleep 1
+  set -x
+  run aws s3 cp --sse AES256 \
+    "${production_migration_file}" \
+    "s3://${aws_bucket_prefix}${environment}${aws_bucket_suffix}/${aws_path_prefix}/"
+  set +x
+done
+
+#
+# Cleanup
+#
+echo
+echo "Production migration files contain sensitive data and should be deleted after uploading!"
+
+proceed "Are you ready to delete the file you uploaded? This will permanently remove this file from your system"
+
+rm -i "${production_migration_file}"

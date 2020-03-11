@@ -79,6 +79,7 @@ migrations.
 
 | Script Name | Description |
 | --- | --- |
+| `upload-secure-migration` | A script to upload secure migrations to all environments |
 
 ### Database Scripts
 
