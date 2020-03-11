@@ -8,7 +8,8 @@ set -eu -o pipefail
 
 readonly dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-readonly local_secure_migrations_dir="${dir}/../migrations/app/secure"
+readonly application=orders
+readonly local_secure_migrations_dir="${dir}/../migrations/${application}/secure"
 readonly prod_migrations_temp_dir="${dir}/../tmp"
 
 #
@@ -82,4 +83,4 @@ EOM
 # Update the migrations manifest
 #
 
-./scripts/update-migrations-manifest
+update-migrations-manifest
