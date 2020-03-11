@@ -16,7 +16,7 @@ readonly aws_bucket_prefix="transcom-ppp-${application}-"
 readonly aws_bucket_suffix="-us-west-2"
 readonly aws_path_prefix="secure-migrations"
 
-readonly usage="usage: $0 <production_migration_file>"
+readonly usage="usage: $0 <production_migration_file>[| <production_migration_file> |...]"
 
 function proceed() {
   proceed_message=${1:-"proceed"}
@@ -34,42 +34,55 @@ function run() {
   ${command[*]} &> /dev/null || (echo "Failed!!" && exit 1)
 }
 
+function verify_file() {
+  production_migration_file="${1}"
+  echo "Verifying production migration file '${production_migration_file}'"
+
+  if [[ ! -f "${1}" ]]; then
+    echo "error: unable to find migration file: ${1}"
+    exit 1
+  fi
+
+  # Migration files need to have the suffix ".up.sql"
+  if [[ "${production_migration_file#*.}" != "up.sql" ]]; then
+    echo "error: migration filename extensions must be '.up.sql'"
+    exit 1
+  fi
+
+  # Ensure the file is below the limit for upload of 250MB for anti-virus
+  # Files larger than this size will not scan and thus will not be available for streaming download
+  # to the migration container.
+  if [ "$(uname -s)" == "Darwin" ]; then
+    FILESIZE=$(/usr/bin/stat -f"%z" "${production_migration_file}")
+  else
+    FILESIZE=$(/usr/bin/stat -c"%s" "${production_migration_file}")
+  fi
+  # 250MB in bytes
+  BYTES_IN_MB=1048576
+  MAX_FILESIZE=$((250 * "${BYTES_IN_MB}" ))
+  if [[ ${FILESIZE} -gt ${MAX_FILESIZE} ]]; then
+    FILESIZE_MB=$(( "${FILESIZE}" / "${BYTES_IN_MB}" ))
+    echo "error: Max file size for upload is 250 MB, this file is too large for anti-virus to work."
+    echo "Your file is ${FILESIZE_MB} MB, please reduce or split before uploading."
+    exit 1
+  fi
+}
+
 #
 # Pre-flight checks
 #
 
+# At least one file required
 if [[ -z "${1:-}" ]]; then
   echo "$usage"
   exit 1
-elif [[ ! -f "${1}" ]]; then
-  echo "error: unable to find migration file: ${1}"
-  exit 1
-fi
-readonly production_migration_file="$1"
-
-# Migration files need to have the suffix ".up.sql"
-if [[ "${production_migration_file#*.}" != "up.sql" ]]; then
-  echo "error: migration filename extensions must be '.up.sql'"
-  exit 1
 fi
 
-# Ensure the file is below the limit for upload of 250MB for anti-virus
-# Files larger than this size will not scan and thus will not be available for streaming download
-# to the migration container.
-if [ "$(uname -s)" == "Darwin" ]; then
-  FILESIZE=$(/usr/bin/stat -f"%z" "${production_migration_file}")
-else
-  FILESIZE=$(/usr/bin/stat -c"%s" "${production_migration_file}")
-fi
-# 250MB in bytes
-BYTES_IN_MB=1048576
-MAX_FILESIZE=$((250 * "${BYTES_IN_MB}" ))
-if [[ ${FILESIZE} -gt ${MAX_FILESIZE} ]]; then
-  FILESIZE_MB=$(( "${FILESIZE}" / "${BYTES_IN_MB}" ))
-  echo "error: Max file size for upload is 250 MB, this file is too large for anti-virus to work."
-  echo "Your file is ${FILESIZE_MB} MB, please reduce or split before uploading."
-  exit 1
-fi
+# Read in the list of files and verify each
+readonly production_migration_files=( "$@" )
+for prod_file in "${production_migration_files[@]}"; do
+  verify_file "${prod_file}"
+done
 
 # Test AWS command and freshen AWS session token
 ${aws_command} s3 ls "${aws_bucket_prefix}${environments[0]}${aws_bucket_suffix}" > /dev/null
@@ -96,7 +109,7 @@ echo
 # Upload secure migration
 #
 
-echo "The file ${production_migration_file} will be uploaded to these locations in s3:"
+echo "The files will be uploaded to these locations in s3:"
 for environment in "${environments[@]}"; do
   echo -e "\ts3://${aws_bucket_prefix}${environment}${aws_bucket_suffix}/${aws_path_prefix}/"
 done
@@ -106,11 +119,13 @@ proceed "Are you ready to upload the migrations? This will overwrite files of th
 for environment in "${environments[@]}"; do
   echo "Uploading to: $environment"
   sleep 1
-  set -x
-  run aws s3 cp --sse AES256 \
-    "${production_migration_file}" \
-    "s3://${aws_bucket_prefix}${environment}${aws_bucket_suffix}/${aws_path_prefix}/"
-  set +x
+
+  # Upload each file to the environment
+  for prod_file in "${production_migration_files[@]}"; do
+    run aws s3 cp --sse AES256 \
+      "${prod_file}" \
+      "s3://${aws_bucket_prefix}${environment}${aws_bucket_suffix}/${aws_path_prefix}/"
+  done
 done
 
 #
@@ -119,6 +134,6 @@ done
 echo
 echo "Production migration files contain sensitive data and should be deleted after uploading!"
 
-proceed "Are you ready to delete the file you uploaded? This will permanently remove this file from your system"
-
-rm -i "${production_migration_file}"
+for prod_file in "${production_migration_files[@]}"; do
+  rm -i "${prod_file}"
+done
