@@ -80,6 +80,9 @@ fi
 
 # Read in the list of files and verify each
 readonly production_migration_files=( "$@" )
+echo
+echo "Verify all files"
+echo
 for prod_file in "${production_migration_files[@]}"; do
   verify_file "${prod_file}"
 done
@@ -91,7 +94,14 @@ ${aws_command} s3 ls "${aws_bucket_prefix}${environments[0]}${aws_bucket_suffix}
 # Test local secure migration
 #
 
+echo
+echo "Ensure migrations manifest is up to date ..."
+
+update-migrations-manifest
+
+echo
 echo "Testing migrations ... (This could be several minutes!)"
+echo
 
 make db_deployed_migrations_reset
 
@@ -102,18 +112,20 @@ MIGRATION_PATH="file://migrations/${application}/schema;file://migrations/${appl
 	DB_DEBUG=0 \
   bin/orders migrate
 
-echo "Testing migrations was successful!"
 echo
+echo "Testing migrations was successful!"
 
 #
 # Upload secure migration
 #
 
+echo
 echo "The files will be uploaded to these locations in s3:"
 for environment in "${environments[@]}"; do
   echo -e "\ts3://${aws_bucket_prefix}${environment}${aws_bucket_suffix}/${aws_path_prefix}/"
 done
 
+echo
 proceed "Are you ready to upload the migrations? This will overwrite files of the same name in S3."
 
 for environment in "${environments[@]}"; do

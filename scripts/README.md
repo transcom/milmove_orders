@@ -79,6 +79,7 @@ migrations.
 
 | Script Name | Description |
 | --- | --- |
+| `download-secure-migration` |  A script to download secure migrations from all environments |
 | `upload-secure-migration` | A script to upload secure migrations to all environments |
 
 ### Database Scripts
