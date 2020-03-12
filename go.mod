@@ -7,7 +7,7 @@ require (
 	github.com/codegangsta/gin v0.0.0-20171026143024-cafe2ce98974
 	github.com/go-openapi/errors v0.19.4
 	github.com/go-openapi/loads v0.19.5
-	github.com/go-openapi/runtime v0.19.11
+	github.com/go-openapi/runtime v0.19.12
 	github.com/go-openapi/spec v0.19.7
 	github.com/go-openapi/strfmt v0.19.5
 	github.com/go-openapi/swag v0.19.8
