@@ -380,10 +380,14 @@ jobs:
           keys:
             - go-mod-sources-v2-{{ checksum "go.sum" }}
       - run: make bin/ecs-deploy
+      - run: make bin/health-checker
+      - run: make bin/tls-checker
       - persist_to_workspace:
           root:  /home/circleci/milmove_orders/bin
           paths:
             - ecs-deploy # for registering task defs and deploying task container
+            - health-checker # for health check after deploy
+            - tls-checker # for tls health check after deploy
       - announce_failure
 
   # `build_orders` builds the application container and pushes to the container repository

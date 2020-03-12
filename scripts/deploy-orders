@@ -3,7 +3,7 @@
 set -eu -o pipefail
 
 #
-# Deploy the orders migrations
+# Deploy the app
 #
 
 usage() {
@@ -19,12 +19,15 @@ readonly CIRCLE_SHA1="${2:-}"
 case "${environment}" in
   experimental)
     compare_host=tsp.experimental.move.mil
+    health_check_hosts=tsp.experimental.move.mil
     ;;
   staging)
     compare_host=tsp.staging.move.mil
+    health_check_hosts=tsp.experimental.move.mil
     ;;
   prod)
     compare_host=tsp.move.mil
+    health_check_hosts=tsp.experimental.move.mil
     ;;
   *)
     echo "<environment> must be one of experimental, staging, or prod"
@@ -51,5 +54,11 @@ if [ -z "${CIRCLE_SHA1}" ]; then
   scripts/compare-deployed-commit "${compare_host}" "${CIRCLE_SHA1}"
 fi
 
-readonly image="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/orders-migrations:git-${CIRCLE_SHA1}"
-scripts/ecs-run-orders-migrations-container "${image}" "${APP_ENVIRONMENT}"
+readonly image="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/orders:git-${CIRCLE_SHA1}"
+scripts/ecs-deploy-service-container orders "${image}" "${APP_ENVIRONMENT}"
+
+# NOTE: The health checker in all environments ought to work with the values from experimental for the key, cert, and ca.
+bin/health-checker --schemes https --hosts "${health_check_hosts}" --key "${KEY}" --cert "${CERT}" --ca "${CA}" --tries 10 --backoff 3 --log-level info --timeout 15m
+bin/tls-checker --schemes https --hosts "${health_check_hosts}" --key "${KEY}" --cert "${CERT}" --ca "${CA}" --log-level info --timeout 15m
+
+scripts/check-deployed-commit "${health_check_hosts}" "${CIRCLE_SHA1}" "${KEY}" "${CERT}" "${CA}"
