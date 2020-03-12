@@ -477,7 +477,7 @@ workflows:
           # if testing on experimental, you can disable these tests by using the commented block below.
           filters:
             branches:
-              ignore: placeholder_branch_name
+              ignore: cg_deploy_app
 
       - build_orders:
           requires:
@@ -504,14 +504,14 @@ workflows:
             - build_migrations
           filters:
             branches:
-              only: cg_deploy_migration_steps
+              only: cg_deploy_app
 
       - deploy_experimental_app:
           requires:
             - deploy_experimental_migrations
           filters:
             branches:
-              only: placeholder_branch_name
+              only: cg_deploy_app
 
 
 experimental:
