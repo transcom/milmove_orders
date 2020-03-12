@@ -165,7 +165,7 @@ commands:
           checkout: false
           dockerfile: << parameters.dockerfile >>
           region: AWS_DEFAULT_REGION
-          repo: orders
+          repo: << parameters.repo >>
           tag: "git-${CIRCLE_SHA1},git-branch-${BRANCH_NAME}"
       - ecr_record_image_digest:
           repo: << parameters.repo >>
