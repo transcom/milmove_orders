@@ -43,6 +43,7 @@ These scripts are primarily used for CircleCI workflows.
 
 | Script Name | Description |
 | --- | --- |
+| `check-deployed-commit` | checks that the deployed commit and given commit match. |
 | `check-generated-code` | checks that the generated code has not changed |
 | `circleci-announce-broken-branch` | announce that a branch is broken |
 | `compare-deployed-commit` | checks that the given commit is ahead of the currently deployed commit |
