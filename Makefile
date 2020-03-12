@@ -230,40 +230,95 @@ db_dev_psql: ## Open PostgreSQL shell for Dev DB
 #
 
 #
+# ----- START DB_DEPLOYED_MIGRATIONS TARGETS -----
+#
+
+.PHONY: db_deployed_migrations_destroy
+db_deployed_migrations_destroy: ## Destroy Deployed Migrations DB
+	@echo "Destroying the ${DB_NAME_DEPLOYED_MIGRATIONS} database ..."
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}" -c "DROP DATABASE IF EXISTS ${DB_NAME_DEPLOYED_MIGRATIONS};" || true
+
+.PHONY: db_deployed_migrations_create
+db_deployed_migrations_create: ## Create Deployed Migrations DB
+	@echo "Create the ${DB_NAME_DEPLOYED_MIGRATIONS} database..."
+	DB_NAME=postgres scripts/wait-for-db
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}" -c "CREATE DATABASE ${DB_NAME_DEPLOYED_MIGRATIONS}" || true
+
+.PHONY: db_deployed_migrations_run
+db_deployed_migrations_run: db_deployed_migrations_create ## Run Deployed Migrations DB (start and create)
+
+.PHONY: db_deployed_migrations_reset
+db_deployed_migrations_reset: db_deployed_migrations_destroy db_deployed_migrations_run ## Reset Deployed Migrations DB (destroy and run)
+
+.PHONY: db_deployed_migrations_migrate_standalone
+db_deployed_migrations_migrate_standalone: bin/orders ## Migrate Deployed Migrations DB with local secure migrations
+	@echo "Migrating the ${DB_NAME_DEPLOYED_MIGRATIONS} database..."
+	DB_NAME=${DB_NAME_DEPLOYED_MIGRATIONS} DB_DEBUG=0 bin/orders migrate -p "file://migrations/${APPLICATION}/secure;file://migrations/${APPLICATION}/schema" -m "migrations/${APPLICATION}/migrations_manifest.txt"
+
+.PHONY: db_deployed_migrations_migrate
+db_deployed_migrations_migrate: db_deployed_migrations_migrate_standalone ## Migrate Deployed Migrations DB
+
+.PHONY: db_deployed_psql
+db_deployed_migrations_psql: ## Open PostgreSQL shell for Deployed Migrations DB
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}"/"${DB_NAME_DEPLOYED_MIGRATIONS}"
+
+#
+# ----- END DB_DEPLOYED_MIGRATIONS TARGETS -----
+#
+
+#
 # ----- START DB_TEST TARGETS -----
 #
 
 .PHONY: db_test_destroy
-db_test_destroy: ## Destroy Dev DB
+db_test_destroy: ## Destroy Test DB
 	@echo "Destroying the ${DB_NAME_TEST} database ..."
 	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}" -c "DROP DATABASE IF EXISTS ${DB_NAME_TEST};" || true
 
 .PHONY: db_test_create
-db_test_create: ## Create Dev DB
+db_test_create: ## Create Test DB
 	@echo "Create the ${DB_NAME_TEST} database..."
 	DB_NAME=postgres scripts/wait-for-db
 	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}" -c "CREATE DATABASE ${DB_NAME_TEST}" || true
 
 .PHONY: db_test_run
-db_test_run: db_test_create ## Run Dev DB (start and create)
+db_test_run: db_test_create ## Run Test DB (start and create)
 
 .PHONY: db_test_reset
-db_test_reset: db_test_destroy db_test_run ## Reset Dev DB (destroy and run)
+db_test_reset: db_test_destroy db_test_run ## Reset Test DB (destroy and run)
 
 .PHONY: db_test_migrate_standalone
-db_test_migrate_standalone: bin/orders ## Migrate Dev DB directly
+db_test_migrate_standalone: bin/orders ## Migrate Test DB directly
 	@echo "Migrating the ${DB_NAME_TEST} database..."
 	DB_NAME=${DB_NAME_TEST} DB_DEBUG=0 bin/orders migrate -p "file://migrations/${APPLICATION}/secure;file://migrations/${APPLICATION}/schema" -m "migrations/${APPLICATION}/migrations_manifest.txt"
 
 .PHONY: db_test_migrate
-db_test_migrate: db_test_migrate_standalone ## Migrate Dev DB
+db_test_migrate: db_test_migrate_standalone ## Migrate Test DB
 
 .PHONY: db_test_psql
-db_test_psql: ## Open PostgreSQL shell for Dev DB
-	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}"/"${DB_NAME}"
+db_test_psql: ## Open PostgreSQL shell for Test DB
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}"/"${DB_NAME_TEST}"
 
 #
 # ----- END DB_TEST TARGETS -----
+#
+
+#
+# ----- START RUN DEPLOYED_MIGRATION TARGETS -----
+#
+
+.PHONY: run_experimental_migrations
+run_experimental_migrations: bin/orders db_deployed_migrations_reset ## Run Experimental migrations against Deployed Migrations DB
+	@echo "Migrating the ${DB_NAME_DEPLOYED_MIGRATIONS} database with experimental migrations..."
+	MIGRATION_PATH="s3://transcom-ppp-${APPLICATION}-experimental-us-west-2/secure-migrations;file://migrations/$(APPLICATION)/schema" \
+	DB_HOST=${DB_HOST} \
+	DB_PORT=$(DB_PORT_DEPLOYED_MIGRATIONS) \
+	DB_NAME=$(DB_NAME_DEPLOYED_MIGRATIONS) \
+	DB_DEBUG=0 \
+	bin/orders migrate
+
+#
+# ----- END RUN DEPLOYED_MIGRATION TARGETS -----
 #
 
 #

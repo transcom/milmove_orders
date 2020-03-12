@@ -7,7 +7,7 @@ set -eu -o pipefail
 #
 
 usage() {
-  echo "$0 <environment>"
+  echo "$0 <environment> [<circleci_sha1>]"
   exit 1
 }
 

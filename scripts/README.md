@@ -79,6 +79,9 @@ migrations.
 
 | Script Name | Description |
 | --- | --- |
+| `download-secure-migration` |  A script to download secure migrations from all environments |
+| `generate-secure-migration` |  A script to help manage the creation of secure migrations |
+| `upload-secure-migration` | A script to upload secure migrations to all environments |
 
 ### Database Scripts
 
