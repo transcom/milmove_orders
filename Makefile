@@ -16,16 +16,16 @@ ifeq ($(UNAME_S),Linux)
 endif
 
 .PHONY: help
-help:  ## Print the help documentation
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+help: ## Print the help documentation
+	@grep -E '^[a-zA-Z\/_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: dev
-dev:
+dev: ## Start development environment
 	docker-compose -f docker-compose.dev.yml build --pull
 	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.dev.yml run --service-ports --rm --name orders_dev dev bash
 
 .PHONY: dev_destroy
-dev_destroy:
+dev_destroy: ## Destroy development environment
 	docker-compose -f docker-compose.dev.yml down
 
 .PHONY: clean
@@ -77,16 +77,24 @@ bin/go-junit-report:
 
 ### Cert Targets
 
-bin/rds-ca-2019-root.pem:
+bin/rds-ca-2019-root.pem: ## RDS CA 2019 Root Cert
 	mkdir -p bin/
 	curl -sSo bin/rds-ca-2019-root.pem https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem
 
-### Orders Targets
+### MilMove Tools Targets
 
-bin/ecs-deploy:
+bin/ecs-deploy: ## ECS Deploy Tool for registering ECS Task Definitions and more
 	go build -ldflags "$(LDFLAGS)" -o bin/ecs-deploy github.com/transcom/mymove/cmd/ecs-deploy
 
-bin/orders:
+bin/health-checker: ## Health Checker ensures host will connect
+	go build -ldflags "$(LDFLAGS)" -o bin/health-checker github.com/transcom/mymove/cmd/health-checker
+
+bin/tls-checker: ## TLS Checker ensures hosts will not connect with invalid TLS versions
+	go build -ldflags "$(LDFLAGS)" -o bin/tls-checker github.com/transcom/mymove/cmd/tls-checker
+
+### Orders Targets
+
+bin/orders: ## Orders Application
 	go build -gcflags="$(GC_FLAGS)" -asmflags=-trimpath=$(GOPATH) -ldflags "$(LDFLAGS) $(WEBSERVER_LDFLAGS)" -o bin/orders ./cmd/orders
 
 #
