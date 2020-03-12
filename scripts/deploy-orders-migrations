@@ -18,13 +18,13 @@ readonly CIRCLE_SHA1="${2:-}"
 
 case "${environment}" in
   experimental)
-    compare_host=orders.experimental.move.mil
+    compare_host=tsp.experimental.move.mil
     ;;
   staging)
-    compare_host=orders.staging.move.mil
+    compare_host=tsp.staging.move.mil
     ;;
   prod)
-    compare_host=orders.move.mil
+    compare_host=tsp.move.mil
     ;;
   *)
     echo "<environment> must be one of experimental, staging, or prod"

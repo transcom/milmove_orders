@@ -445,8 +445,8 @@ jobs:
       - deploy_app_steps:
           repo: orders
           environment: experimental
-          compare_host: orders.experimental.move.mil
-          health_check_hosts: orders.experimental.move.mil
+          compare_host: tsp.experimental.move.mil
+          health_check_hosts: tsp.experimental.move.mil
 
 workflows:
   version: 2
