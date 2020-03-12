@@ -152,8 +152,6 @@ const (
 // ElectronicOrdersRevision represents a complete amendment of one set of electronic orders
 type ElectronicOrdersRevision struct {
 	ID                    uuid.UUID                   `json:"id" db:"id"`
-	CreatedAt             time.Time                   `json:"created_at" db:"created_at"`
-	UpdatedAt             time.Time                   `json:"updated_at" db:"updated_at"`
 	ElectronicOrderID     uuid.UUID                   `json:"electronic_order_id" db:"electronic_order_id"`
 	ElectronicOrder       ElectronicOrder             `belongs_to:"electronic_order"`
 	SeqNum                int                         `json:"seq_num" db:"seq_num"`
@@ -201,6 +199,8 @@ type ElectronicOrdersRevision struct {
 	UbSDN                 *string                     `json:"ub_sdn" db:"ub_sdn"`
 	UbLOA                 *string                     `json:"ub_loa" db:"ub_loa"`
 	Comments              *string                     `json:"comments" db:"comments"`
+	CreatedAt             time.Time                   `json:"created_at" db:"created_at"`
+	UpdatedAt             time.Time                   `json:"updated_at" db:"updated_at"`
 }
 
 // String is not required by pop and may be deleted
