@@ -1,3 +1,6 @@
+# bash
+.bash_history
+
 # direnv
 .envrc.local
 .envrc.chamber
