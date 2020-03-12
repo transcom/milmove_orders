@@ -58,6 +58,9 @@ services:
       - GO111MODULE=auto
       - GOLANGCI_LINT_CONCURRENCY=6
       - GOLANGCI_LINT_VERBOSE=
+      - HISTFILE=/home/circleci/milmove_orders/.bash_history
+      - HISTFILESIZE=5000
+      - HISTSIZE=5000
       - HTTP_ORDERS_SERVER_NAME=orderslocal
       - IWS_RBS_ENABLED=0
       - IWS_RBS_HOST=pkict.dmdc.osd.mil

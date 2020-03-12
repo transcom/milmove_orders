@@ -1,8 +1,8 @@
 CREATE TABLE electronic_orders (
 	id uuid PRIMARY KEY,
-	orders_number text,
-	edipi text,
-	issuer text,
+	orders_number text NOT NULL,
+	edipi text NOT NULL,
+	issuer text NOT NULL,
 	created_at timestamp without time zone NOT NULL,
 	updated_at timestamp without time zone NOT NULL
 );

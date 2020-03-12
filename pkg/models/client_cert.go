@@ -16,8 +16,6 @@ type ClientCert struct {
 	Sha256Digest                string    `db:"sha256_digest"`
 	Subject                     string    `db:"subject"`
 	AllowOrdersAPI              bool      `db:"allow_orders_api"`
-	CreatedAt                   time.Time `db:"created_at"`
-	UpdatedAt                   time.Time `db:"updated_at"`
 	AllowAirForceOrdersRead     bool      `db:"allow_air_force_orders_read"`
 	AllowAirForceOrdersWrite    bool      `db:"allow_air_force_orders_write"`
 	AllowArmyOrdersRead         bool      `db:"allow_army_orders_read"`
@@ -28,6 +26,8 @@ type ClientCert struct {
 	AllowMarineCorpsOrdersWrite bool      `db:"allow_marine_corps_orders_write"`
 	AllowNavyOrdersRead         bool      `db:"allow_navy_orders_read"`
 	AllowNavyOrdersWrite        bool      `db:"allow_navy_orders_write"`
+	CreatedAt                   time.Time `db:"created_at"`
+	UpdatedAt                   time.Time `db:"updated_at"`
 }
 
 // Validate gets run every time you call a "pop.Validate*" (pop.ValidateAndSave, pop.ValidateAndCreate, pop.ValidateAndUpdate) method.

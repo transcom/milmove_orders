@@ -31,12 +31,12 @@ const (
 // ElectronicOrder contains the unchanging data of a set of orders across all amendments / revisions
 type ElectronicOrder struct {
 	ID           uuid.UUID                 `json:"id" db:"id"`
-	CreatedAt    time.Time                 `json:"created_at" db:"created_at"`
-	UpdatedAt    time.Time                 `json:"updated_at" db:"updated_at"`
 	OrdersNumber string                    `json:"orders_number" db:"orders_number"`
 	Edipi        string                    `json:"edipi" db:"edipi"`
 	Issuer       Issuer                    `json:"issuer" db:"issuer"`
 	Revisions    ElectronicOrdersRevisions `has_many:"electronic_orders_revisions" order_by:"seq_num asc"`
+	CreatedAt    time.Time                 `json:"created_at" db:"created_at"`
+	UpdatedAt    time.Time                 `json:"updated_at" db:"updated_at"`
 }
 
 // String is not required by pop and may be deleted

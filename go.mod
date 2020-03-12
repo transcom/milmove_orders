@@ -3,15 +3,15 @@ module github.com/transcom/milmove_orders
 go 1.14
 
 require (
-	github.com/aws/aws-sdk-go v1.29.20
+	github.com/aws/aws-sdk-go v1.29.21
 	github.com/codegangsta/gin v0.0.0-20171026143024-cafe2ce98974
-	github.com/go-openapi/errors v0.19.3
+	github.com/go-openapi/errors v0.19.4
 	github.com/go-openapi/loads v0.19.5
-	github.com/go-openapi/runtime v0.19.11
-	github.com/go-openapi/spec v0.19.6
+	github.com/go-openapi/runtime v0.19.12
+	github.com/go-openapi/spec v0.19.7
 	github.com/go-openapi/strfmt v0.19.5
-	github.com/go-openapi/swag v0.19.7
-	github.com/go-openapi/validate v0.19.6
+	github.com/go-openapi/swag v0.19.8
+	github.com/go-openapi/validate v0.19.7
 	github.com/gobuffalo/envy v1.9.0
 	github.com/gobuffalo/pop v4.13.1+incompatible
 	github.com/gobuffalo/validate v2.0.4+incompatible
