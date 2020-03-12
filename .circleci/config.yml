@@ -66,7 +66,9 @@ commands:
           at: /home/circleci/milmove_orders/bin
       - run:
           name: Get Digest from filesystem
-          command: echo 'export ECR_DIGEST=$(cat /home/circleci/milmove_orders/bin/sha/ECR_DIGEST_<< parameters.repo >>)' | tee -a "${BASH_ENV}"
+          command: |
+            echo "export ECR_DIGEST=$(cat /home/circleci/milmove_orders/bin/sha/ECR_DIGEST_<< parameters.repo >>)" | tee -a "${BASH_ENV}"
+            source $BASH_ENV
       - run:
           name: Snapshot database
           command: do-exclusively --job-name ${CIRCLE_JOB} scripts/rds-snapshot-orders-db << parameters.environment >>
@@ -100,7 +102,9 @@ commands:
           at: /home/circleci/milmove_orders/bin
       - run:
           name: Get Digest from filesystem
-          command: echo 'export ECR_DIGEST=$(cat /home/circleci/milmove_orders/bin/sha/ECR_DIGEST_<< parameters.repo >>)' | tee -a "${BASH_ENV}"
+          command: |
+            echo "export ECR_DIGEST=$(cat /home/circleci/milmove_orders/bin/sha/ECR_DIGEST_<< parameters.repo >>)" | tee -a "${BASH_ENV}"
+            source $BASH_ENV
       - deploy:
           name: Deploy orders service
           command: do-exclusively --job-name ${CIRCLE_JOB} scripts/ecs-deploy-service-container orders "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/<< parameters.repo >>@${ECR_DIGEST}" << parameters.environment >>
@@ -261,7 +265,11 @@ jobs:
       - restore_cache:
           keys:
             - go-mod-sources-v2-{{ checksum "go.sum" }}
-      - run: echo 'export PATH=${PATH}:~/go/bin:~/milmove_orders/bin' >> $BASH_ENV
+      - run:
+          name: set $$PATH variable
+          command: |
+            echo 'export PATH=${PATH}:~/go/bin:~/milmove_orders/bin' >> $BASH_ENV
+            source $BASH_ENV
       - run: make server_generate
       - run: scripts/check-generated-code
       - save_cache:
@@ -281,7 +289,11 @@ jobs:
       - restore_cache:
           keys:
             - pre-commit-dot-cache-{{ checksum ".pre-commit-config.yaml" }}
-      - run: echo 'export PATH=${PATH}:~/go/bin:~/milmove_orders/bin' >> $BASH_ENV
+      - run:
+          name: set $$PATH variable
+          command: |
+            echo 'export PATH=${PATH}:~/go/bin:~/milmove_orders/bin' >> $BASH_ENV
+            source $BASH_ENV
       # this is so we can avoid go mod downloading and resulting in an error on a false positive
       - run: scripts/pre-commit-go-mod || exit 0
       - run:
@@ -342,7 +354,11 @@ jobs:
       - restore_cache:
           keys:
             - go-mod-sources-v2-{{ checksum "go.sum" }}
-      - run: echo 'export PATH=${PATH}:~/go/bin:~/milmove_orders/bin' >> $BASH_ENV
+      - run:
+          name: set $$PATH variable
+          command: |
+            echo 'export PATH=${PATH}:~/go/bin:~/milmove_orders/bin' >> $BASH_ENV
+            source $BASH_ENV
       - run: sudo apt-get update && sudo apt-get install -yy postgresql-client
       - run: make bin/go-junit-report
       - run: make bin/orders
@@ -434,7 +450,7 @@ jobs:
     executor: milmove_orders_small
     steps:
       - deploy_migrations_steps:
-          repo: orders
+          repo: orders-migrations
           environment: experimental
 
   # `deploy_experimental_app` updates the server-TLS app service in the experimental environment
