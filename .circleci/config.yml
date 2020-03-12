@@ -497,13 +497,12 @@ workflows:
           # if testing on experimental, you can disable these tests by using the commented block below.
           filters:
             branches:
-              ignore: cg_deploy_app
+              ignore: placeholder_branch_name
 
       - build_orders:
           requires:
             - pre_deps_golang
             - acceptance_tests_local # don't bother building and pushing the application if it won't even start properly
-
 
       - build_tools:
           requires:
@@ -524,15 +523,14 @@ workflows:
             - build_migrations
           filters:
             branches:
-              only: cg_deploy_app
+              only: placeholder_branch_name
 
       - deploy_experimental_app:
           requires:
             - deploy_experimental_migrations
           filters:
             branches:
-              only: cg_deploy_app
-
+              only: placeholder_branch_name
 
 experimental:
   notify:
