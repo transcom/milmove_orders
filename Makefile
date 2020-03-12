@@ -304,6 +304,24 @@ db_test_psql: ## Open PostgreSQL shell for Test DB
 #
 
 #
+# ----- START RUN DEPLOYED_MIGRATION TARGETS -----
+#
+
+.PHONY: run_experimental_migrations
+run_experimental_migrations: bin/orders db_deployed_migrations_reset ## Run Experimental migrations against Deployed Migrations DB
+	@echo "Migrating the ${DB_NAME_DEPLOYED_MIGRATIONS} database with experimental migrations..."
+	MIGRATION_PATH="s3://transcom-ppp-${APPLICATION}-experimental-us-west-2/secure-migrations;file://migrations/$(APPLICATION)/schema" \
+	DB_HOST=${DB_HOST} \
+	DB_PORT=$(DB_PORT_DEPLOYED_MIGRATIONS) \
+	DB_NAME=$(DB_NAME_DEPLOYED_MIGRATIONS) \
+	DB_DEBUG=0 \
+	bin/orders migrate
+
+#
+# ----- END RUN DEPLOYED_MIGRATION TARGETS -----
+#
+
+#
 # ----- START DOCKER COMPOSE BRANCH TARGETS -----
 #
 
