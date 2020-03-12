@@ -12,7 +12,7 @@ usage() {
 }
 
 readonly environment="${1:-experimental}"
-readonly CIRCLE_SHA1="${2:-}"
+CIRCLE_SHA1="${2:-}"
 
 [[ -z "${environment}" ]] && usage
 
@@ -51,7 +51,7 @@ if [ -z "${CIRCLE_SHA1}" ]; then
 
   CIRCLE_SHA1=$(curl -sk --key <(echo "${KEY}" | base64 --decode) --cert <(echo "${CERT}" | base64 --decode) --cacert <(echo "${CA}" | base64 --decode) "https://${compare_host}/health"  | jq -r .gitCommit)
 
-  scripts/compare-deployed-commit "${compare_host}" "${CIRCLE_SHA1}"
+  scripts/compare-deployed-commit "${compare_host}" "${CIRCLE_SHA1}" "${KEY}" "${CERT}" "${CA}"
 fi
 
 readonly image="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/orders:git-${CIRCLE_SHA1}"

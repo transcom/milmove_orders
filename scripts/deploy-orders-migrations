@@ -12,7 +12,7 @@ usage() {
 }
 
 readonly environment="${1:-experimental}"
-readonly CIRCLE_SHA1="${2:-}"
+CIRCLE_SHA1="${2:-}"
 
 [[ -z "${environment}" ]] && usage
 
