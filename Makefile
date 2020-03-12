@@ -83,13 +83,13 @@ bin/rds-ca-2019-root.pem: ## RDS CA 2019 Root Cert
 
 ### MilMove Tools Targets
 
-bin/ecs-deploy: ## ECS Deploy Tool
+bin/ecs-deploy: ## ECS Deploy Tool for registering ECS Task Definitions and more
 	go build -ldflags "$(LDFLAGS)" -o bin/ecs-deploy github.com/transcom/mymove/cmd/ecs-deploy
 
-bin/health-checker: ## Health Checker
+bin/health-checker: ## Health Checker ensures host will connect
 	go build -ldflags "$(LDFLAGS)" -o bin/health-checker github.com/transcom/mymove/cmd/health-checker
 
-bin/tls-checker: ## TLS Health Checker
+bin/tls-checker: ## TLS Checker ensures hosts will not connect with invalid TLS versions
 	go build -ldflags "$(LDFLAGS)" -o bin/tls-checker github.com/transcom/mymove/cmd/tls-checker
 
 ### Orders Targets
