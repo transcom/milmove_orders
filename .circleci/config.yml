@@ -43,7 +43,7 @@ commands:
     steps:
       - slack/status:
           fail_only: true
-          failure_message: 'The $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME commit $CIRCLE_SHA1 broke on job $CIRCLE_JOB! Contact $CIRCLE_USERNAME for more information.'
+          failure_message: 'The ${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} commit ${CIRCLE_SHA1} broke on job ${CIRCLE_JOB}! Contact ${CIRCLE_USERNAME} for more information.'
           only_for_branches: master
           webhook: ${SLACK_WEBHOOK_URL}
       - run:
@@ -56,6 +56,8 @@ commands:
 
   deploy_migrations_steps:
     parameters:
+      repo:
+        type: string
       environment:
         type: string
     steps:
@@ -63,15 +65,74 @@ commands:
       - attach_workspace:
           at: /home/circleci/milmove_orders/bin
       - run:
+          name: Get Digest from filesystem
+          command: echo 'export ECR_DIGEST=$(cat /home/circleci/milmove_orders/bin/sha/ECR_DIGEST_<< parameters.repo >>)' | tee -a "${BASH_ENV}"
+      - run:
           name: Snapshot database
           command: do-exclusively --job-name ${CIRCLE_JOB} scripts/rds-snapshot-orders-db << parameters.environment >>
       - run:
           name: Run migrations
-          command: do-exclusively --job-name ${CIRCLE_JOB} scripts/ecs-run-orders-migrations-container ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/orders-migrations:git-${CIRCLE_SHA1} << parameters.environment >>
+          command: do-exclusively --job-name ${CIRCLE_JOB} scripts/ecs-run-orders-migrations-container ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/<< parameters.repo >>@{ECR_DIGEST} << parameters.environment >>
           no_output_timeout: 60m
           environment:
             CHAMBER_RETRIES: 20
       - announce_failure
+  deploy_app_steps:
+    parameters:
+      repo:
+        type: string
+      environment:
+        type: string
+      compare_host:
+        type: string
+      health_check_hosts:
+        type: string
+    steps:
+      - checkout
+      - run:
+          name: Compare against deployed commit
+          command: |
+            [[ -z "<< parameters.compare_host >>" ]] || scripts/compare-deployed-commit "<< parameters.compare_host >>" ${CIRCLE_SHA1} ${EXPERIMENTAL_MOVE_MIL_DOD_TLS_KEY} ${EXPERIMENTAL_MOVE_MIL_DOD_TLS_CERT} ${EXPERIMENTAL_MOVE_MIL_DOD_TLS_CA}
+      - restore_cache:
+          keys:
+            - go-mod-sources-v2-{{ checksum "go.sum" }}
+      - attach_workspace:
+          at: /home/circleci/milmove_orders/bin
+      - run:
+          name: Get Digest from filesystem
+          command: echo 'export ECR_DIGEST=$(cat /home/circleci/milmove_orders/bin/sha/ECR_DIGEST_<< parameters.repo >>)' | tee -a "${BASH_ENV}"
+      - deploy:
+          name: Deploy orders service
+          command: do-exclusively --job-name ${CIRCLE_JOB} scripts/ecs-deploy-service-container orders "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/<< parameters.repo >>@${ECR_DIGEST}" << parameters.environment >>
+          no_output_timeout: 20m
+      - run:
+          name: Health Check
+          command: |
+            bin/health-checker --schemes https --hosts << parameters.health_check_hosts >> --key ${EXPERIMENTAL_MOVE_MIL_DOD_TLS_KEY} --cert ${EXPERIMENTAL_MOVE_MIL_DOD_TLS_CERT} --ca ${EXPERIMENTAL_MOVE_MIL_DOD_TLS_CA} --tries 10 --backoff 3 --log-level info --timeout 15m
+      - run:
+          name: TLS Check
+          command: |
+            bin/tls-checker --schemes https --hosts << parameters.health_check_hosts >> --key ${EXPERIMENTAL_MOVE_MIL_DOD_TLS_KEY} --cert ${EXPERIMENTAL_MOVE_MIL_DOD_TLS_CERT} --ca ${EXPERIMENTAL_MOVE_MIL_DOD_TLS_CA} --log-level info --timeout 15m
+      - run:
+          name: Check deployed commits
+          command: scripts/check-deployed-commit "<< parameters.health_check_hosts >>" "${CIRCLE_SHA1}" ${EXPERIMENTAL_MOVE_MIL_DOD_TLS_KEY} ${EXPERIMENTAL_MOVE_MIL_DOD_TLS_CERT} ${EXPERIMENTAL_MOVE_MIL_DOD_TLS_CA}
+      - announce_failure
+
+  ecr_record_image_digest:
+    parameters:
+      repo:
+        type: string
+    steps:
+      - run:
+          name: Record ECR Image Digest
+          command: |
+            mkdir -p /home/circleci/milmove_orders/bin/sha
+            echo $(aws ecr describe-images --repository-name << parameters.repo >> --image-ids imageTag=git-${CIRCLE_SHA1} | jq ".imageDetails[0] .imageDigest" -r) > /home/circleci/milmove_orders/bin/sha/ECR_DIGEST_<< parameters.repo >>
+            cat /home/circleci/milmove_orders/bin/sha/ECR_DIGEST_<< parameters.repo >>
+      - persist_to_workspace:
+          root: bin
+          paths:
+            - sha/
 
   ecr_describe_image_scan_findings:
     parameters:
@@ -81,6 +142,35 @@ commands:
       - run:
           name: 'Describe image scan findings'
           command: scripts/ecr-describe-image-scan-findings << parameters.repo >> ${CIRCLE_SHA1}
+
+  build_tag_push:
+    parameters:
+      dockerfile:
+        type: string
+      repo:
+        type: string
+    steps:
+      - run:
+          name: Fix branch name
+          command: |
+            echo 'shopt -s extglob' >> $BASH_ENV
+            echo 'export BRANCH_NAME=${CIRCLE_BRANCH//+([^A-Za-z0-9-.])/-}' >> $BASH_ENV
+            source $BASH_ENV
+            echo "${BRANCH_NAME}"
+      - aws-ecr/build-and-push-image:
+          account-url: AWS_ECR_ACCOUNT_URL
+          attach-workspace: true
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          checkout: false
+          dockerfile: << parameters.dockerfile >>
+          region: AWS_DEFAULT_REGION
+          repo: orders
+          tag: "git-${CIRCLE_SHA1},git-branch-${BRANCH_NAME}"
+      - ecr_record_image_digest:
+          repo: << parameters.repo >>
+      - ecr_describe_image_scan_findings:
+          repo: << parameters.repo >>
 
   server_tests_step:
     parameters:
@@ -292,24 +382,8 @@ jobs:
             - go-mod-sources-v2-{{ checksum "go.sum" }}
       - run: make bin/rds-ca-2019-root.pem
       - run: make bin/orders
-      - run:
-          name: Fix branch name
-          command: |
-            echo 'shopt -s extglob' >> $BASH_ENV
-            echo 'export BRANCH_NAME=${CIRCLE_BRANCH//+([^A-Za-z0-9-.])/-}' >> $BASH_ENV
-            source $BASH_ENV
-            echo "${BRANCH_NAME}"
-      - aws-ecr/build-and-push-image:
-          account-url: AWS_ECR_ACCOUNT_URL
-          attach-workspace: true
-          aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-          checkout: false
+      - build_tag_push:
           dockerfile: Dockerfile
-          region: AWS_DEFAULT_REGION
-          repo: orders
-          tag: "git-${CIRCLE_SHA1},git-branch-${BRANCH_NAME}"
-      - ecr_describe_image_scan_findings:
           repo: orders
       - announce_failure
 
@@ -320,26 +394,13 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: false
+      - restore_cache:
+          keys:
+            - go-mod-sources-v2-{{ checksum "go.sum" }}
       - run: make bin/rds-ca-2019-root.pem
       - run: make bin/orders
-      - run:
-          name: Fix branch name
-          command: |
-            echo 'shopt -s extglob' >> $BASH_ENV
-            echo 'export BRANCH_NAME=${CIRCLE_BRANCH//+([^A-Za-z0-9-.])/-}' >> $BASH_ENV
-            source $BASH_ENV
-            echo "${BRANCH_NAME}"
-      - aws-ecr/build-and-push-image:
-          account-url: AWS_ECR_ACCOUNT_URL
-          attach-workspace: true
-          aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-          checkout: false
+      - build_tag_push:
           dockerfile: Dockerfile.migrations
-          region: AWS_DEFAULT_REGION
-          repo: orders-migrations
-          tag: "git-${CIRCLE_SHA1},git-branch-${BRANCH_NAME}"
-      - ecr_describe_image_scan_findings:
           repo: orders-migrations
       - announce_failure
 
@@ -359,8 +420,8 @@ jobs:
             CHAMBER_RETRIES: 20
             DB_REGION: us-west-2
             DB_RETRY_INTERVAL: 5s
-            DEVLOCAL_CA: /home/circleci/transcom/mymove/config/tls/devlocal-ca.pem
-            DOD_CA_PACKAGE: /home/circleci/transcom/mymove/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
+            DEVLOCAL_CA: /home/circleci/milmove_orders/config/tls/devlocal-ca.pem
+            DOD_CA_PACKAGE: /home/circleci/milmove_orders/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
             ENV: test
             ENVIRONMENT: experimental
             MUTUAL_TLS_ENABLED: true
@@ -373,7 +434,19 @@ jobs:
     executor: milmove_orders_small
     steps:
       - deploy_migrations_steps:
+          repo: orders
           environment: experimental
+
+  # `deploy_experimental_app` updates the server-TLS app service in the experimental environment
+  deploy_experimental_app:
+    executor: milmove_orders_small
+    environment:
+    steps:
+      - deploy_app_steps:
+          repo: orders
+          environment: experimental
+          compare_host: orders.experimental.move.mil
+          health_check_hosts: orders.experimental.move.mil
 
 workflows:
   version: 2
@@ -432,6 +505,13 @@ workflows:
           filters:
             branches:
               only: cg_deploy_migration_steps
+
+      - deploy_experimental_app:
+          requires:
+            - deploy_experimental_migrations
+          filters:
+            branches:
+              only: placeholder_branch_name
 
 
 experimental:
