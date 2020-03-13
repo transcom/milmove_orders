@@ -97,6 +97,9 @@ bin/tls-checker: ## TLS Checker ensures hosts will not connect with invalid TLS 
 bin/orders: ## Orders Application
 	go build -gcflags="$(GC_FLAGS)" -asmflags=-trimpath=$(GOPATH) -ldflags "$(LDFLAGS) $(WEBSERVER_LDFLAGS)" -o bin/orders ./cmd/orders
 
+bin/orders-api-client: ## Orders API Client
+	go build -gcflags="$(GC_FLAGS)" -asmflags=-trimpath=$(GOPATH) -ldflags "$(LDFLAGS) $(WEBSERVER_LDFLAGS)" -o bin/orders-api-client ./cmd/orders-api-client
+
 #
 # ----- END BIN TARGETS -----
 #
