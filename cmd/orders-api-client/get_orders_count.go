@@ -16,7 +16,7 @@ import (
 
 const (
 	// IssuerFlag is the orders uuid flag
-	IssuerFlag string = "issuers"
+	IssuerFlag string = "issuer"
 )
 
 func initGetOrdersCountFlags(flag *pflag.FlagSet) {
@@ -36,7 +36,7 @@ func checkGetOrdersCountConfig(v *viper.Viper, args []string, logger *log.Logger
 	if issuer == "" {
 		return fmt.Errorf("An issuer must be provided")
 	} else if !stringInSlice(issuer, validIssuers) {
-		return fmt.Errorf("Invalid issuer %q, must be one of %v", issuer, validIssuers)
+		return fmt.Errorf("Invalid issuer %q, must be one of %q", issuer, validIssuers)
 	}
 
 	return nil

@@ -41,6 +41,7 @@ const (
 
 func initPostRevisionsFlags(flag *pflag.FlagSet) {
 	flag.String(CSVFileFlag, "", "The CSV File")
+	flag.String(IssuerFlag, "navy", "The Issuer of the orders")
 
 	flag.SortFlags = false
 }
@@ -57,6 +58,15 @@ func checkPostRevisionsConfig(v *viper.Viper, args []string, logger *log.Logger)
 	}
 	if _, err := os.Stat(csvFile); os.IsNotExist(err) {
 		return fmt.Errorf("Expected %s to be a path in the filesystem: %w", csvFile, &errInvalidCSVFile{Path: csvFile})
+	}
+
+	// Currently the CSV parsing only support Navy orders
+	issuer := v.GetString(IssuerFlag)
+	validIssuers := []string{"navy"}
+	if issuer == "" {
+		return fmt.Errorf("An issuer must be provided")
+	} else if !stringInSlice(issuer, validIssuers) {
+		return fmt.Errorf("Invalid issuer %q, must be one of %q", issuer, validIssuers)
 	}
 	return nil
 }

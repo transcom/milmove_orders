@@ -68,6 +68,8 @@ The output is a JSON structure with the count and the issuer:
 
 ### Post Revisions
 
+**NOTE**: Currently the client only support posting revisions for **Navy** orders.
+
 The `orders-api-client post-revisions` command ingests CSV files containing orders information and makes updates to the
 database via the Orders API. Example usage is as follows:
 
