@@ -34,3 +34,6 @@ schema.sql
 
 # Certs
 *.srl
+
+# Files
+*.csv

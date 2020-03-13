@@ -73,6 +73,16 @@ func main() {
 	initGetOrdersFlags(getOrdersCommand.Flags())
 	root.AddCommand(getOrdersCommand)
 
+	postRevisionsCommand := &cobra.Command{
+		Use:          "post-revisions",
+		Short:        "Post Revisions",
+		Long:         "Post Revisions to orders from a CSV file",
+		RunE:         postRevisions,
+		SilenceUsage: true,
+	}
+	initPostRevisionsFlags(postRevisionsCommand.Flags())
+	root.AddCommand(postRevisionsCommand)
+
 	completionCommand := &cobra.Command{
 		Use:   "completion",
 		Short: "Generates bash completion scripts",

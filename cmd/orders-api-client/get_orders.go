@@ -21,7 +21,7 @@ const (
 )
 
 func initGetOrdersFlags(flag *pflag.FlagSet) {
-	flag.String(OrdersUUIDFlag, "", "The UUID of the ")
+	flag.String(OrdersUUIDFlag, "", "The orders UUID value")
 
 	flag.SortFlags = false
 }
