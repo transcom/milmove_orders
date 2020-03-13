@@ -34,7 +34,7 @@ require (
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/objx v0.2.0
 	github.com/stretchr/testify v1.5.1
-	github.com/transcom/mymove v0.0.0-20200312181511-7e6bac4e3c91
+	github.com/transcom/mymove v0.0.0-20200313204145-d3eca0002421
 	go.uber.org/zap v1.14.0
 	goji.io v2.0.2+incompatible
 	golang.org/x/mod v0.2.0 // indirect
@@ -43,6 +43,7 @@ require (
 	golang.org/x/tools v0.0.0-20200224181240-023911ca70b2 // indirect
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
 	gopkg.in/ini.v1 v1.52.0 // indirect
+	pault.ag/go/pksigner v1.0.2
 )
 
 // transcom/sqlx v1.2.1 is just jmoiron's 1.2.0 with custom driver fixes

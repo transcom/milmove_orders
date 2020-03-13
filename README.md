@@ -8,6 +8,11 @@ the public domain. In places where it is eligible for copyright, such as some fo
 this work is licensed under [the MIT License](https://opensource.org/licenses/MIT), the full text of which is included
 in the [LICENSE.txt](./LICENSE.txt) file in this repository.
 
+## Documentation
+
+Primary documentation can be found in the [documentation folder](./docs/README.md). There you will find information
+on the Orders API Client and Server.
+
 ## Docker Compose
 
 The primary development tool for building and testing is docker-compose. The advantage of developing with Docker

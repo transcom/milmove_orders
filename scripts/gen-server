@@ -2,17 +2,58 @@
 
 set -eu -o pipefail
 
+# Remove the generated code
 gendir=./pkg/gen
 
 # Clean out the old generated files
 rm -rf $gendir
 mkdir -p $gendir
 
-# Run each swagger process in the background and wait for them to finish
-swagger generate server -q -f swagger/orders.yaml -t $gendir --model-package ordersmessages --server-package ordersapi --api-package ordersoperations --exclude-main -A milmove_orders &
-pids[0]=$!
+# Use the built-in swagger client built into docker
+swagger_func() {
+  /usr/local/bin/swagger "$@"
+}
+
+# Capture all PIDs so we can do the work async
+pids=()
+
+# Generate server code
+function generate_server () {
+  if [ "$#" -ne 4 ]; then
+    echo "Illegal number of parameters to generate_server, got $#, expected 4"
+    exit 1
+  fi
+  swagger_file=$1
+  model_package=$2
+  server_package=$3
+  api_package=$4
+
+  swagger_func generate server -q -f "${swagger_file}" -t "${gendir}" --model-package "${model_package}" --server-package "${server_package}" --api-package "${api_package}" --exclude-main -A milmove_orders &
+  pids+=($!)
+}
+
+# Generate client code
+function generate_client () {
+  if [ "$#" -ne 3 ]; then
+    echo "Illegal number of parameters to generate_client, got $#, expected 3"
+    exit 1
+  fi
+  swagger_file=$1
+  model_package=$2
+  client_package=$3
+
+  swagger_func generate client -q -f "${swagger_file}" -t "${gendir}" --model-package "${model_package}" --client-package "${client_package}" -A milmove_orders &
+  pids+=($!)
+}
+
+# Generate Server Code
+# For readability they have been sorted and spaces added
+generate_server swagger/orders.yaml   ordersmessages   ordersapi   ordersoperations
+
+# Generate Client Code
+generate_client swagger/orders.yaml ordersmessages ordersclient
 
 # Wait for all processes to finish
 for pid in ${pids[*]}; do
-  wait $pid
+  wait "${pid}"
 done

@@ -76,6 +76,52 @@ func init() {
         }
       }
     },
+    "/issuers/{issuer}/count": {
+      "get": {
+        "description": "Gets a Count of Orders by issuer.\n## Errors\nUsers of this endpoint must have permission to read Orders for the ` + "`" + `issuer` + "`" + ` associated with the Orders. If not, this endpoint will return ` + "`" + `403 Forbidden` + "`" + `.",
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Retrieve a count of Orders by issuer",
+        "operationId": "getOrdersCount",
+        "parameters": [
+          {
+            "enum": [
+              "army",
+              "navy",
+              "air-force",
+              "marine-corps",
+              "coast-guard"
+            ],
+            "type": "string",
+            "description": "Organization that issued the Orders.",
+            "name": "issuer",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "$ref": "#/definitions/OrdersCount"
+            }
+          },
+          "400": {
+            "description": "Invalid"
+          },
+          "401": {
+            "description": "must be authenticated to use this endpoint"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
     "/issuers/{issuer}/orders/{ordersNum}": {
       "get": {
         "description": "Return Orders with the provided issuer and orders number.\n# Errors\nUsers of this endpoint must have permission to read Orders for the specified issuer. Otherwise, this endpoint will return ` + "`" + `403 Forbidden` + "`" + `.\nIf there are no Orders with the specified orders number from the specified issuer, then this endpoint will return ` + "`" + `404 Not Found` + "`" + `.",
@@ -435,6 +481,22 @@ func init() {
           "type": "string",
           "format": "uuid",
           "example": "80200fa9-4ee2-49c5-b4fd-88b3ef4bd5eb"
+        }
+      }
+    },
+    "OrdersCount": {
+      "type": "object",
+      "required": [
+        "count",
+        "issuer"
+      ],
+      "properties": {
+        "count": {
+          "description": "The number of orders in the DB by issuer.\n",
+          "type": "integer"
+        },
+        "issuer": {
+          "$ref": "#/definitions/Issuer"
         }
       }
     },
@@ -751,6 +813,52 @@ func init() {
         }
       }
     },
+    "/issuers/{issuer}/count": {
+      "get": {
+        "description": "Gets a Count of Orders by issuer.\n## Errors\nUsers of this endpoint must have permission to read Orders for the ` + "`" + `issuer` + "`" + ` associated with the Orders. If not, this endpoint will return ` + "`" + `403 Forbidden` + "`" + `.",
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Retrieve a count of Orders by issuer",
+        "operationId": "getOrdersCount",
+        "parameters": [
+          {
+            "enum": [
+              "army",
+              "navy",
+              "air-force",
+              "marine-corps",
+              "coast-guard"
+            ],
+            "type": "string",
+            "description": "Organization that issued the Orders.",
+            "name": "issuer",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "$ref": "#/definitions/OrdersCount"
+            }
+          },
+          "400": {
+            "description": "Invalid"
+          },
+          "401": {
+            "description": "must be authenticated to use this endpoint"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
     "/issuers/{issuer}/orders/{ordersNum}": {
       "get": {
         "description": "Return Orders with the provided issuer and orders number.\n# Errors\nUsers of this endpoint must have permission to read Orders for the specified issuer. Otherwise, this endpoint will return ` + "`" + `403 Forbidden` + "`" + `.\nIf there are no Orders with the specified orders number from the specified issuer, then this endpoint will return ` + "`" + `404 Not Found` + "`" + `.",
@@ -1110,6 +1218,23 @@ func init() {
           "type": "string",
           "format": "uuid",
           "example": "80200fa9-4ee2-49c5-b4fd-88b3ef4bd5eb"
+        }
+      }
+    },
+    "OrdersCount": {
+      "type": "object",
+      "required": [
+        "count",
+        "issuer"
+      ],
+      "properties": {
+        "count": {
+          "description": "The number of orders in the DB by issuer.\n",
+          "type": "integer",
+          "minimum": 0
+        },
+        "issuer": {
+          "$ref": "#/definitions/Issuer"
         }
       }
     },

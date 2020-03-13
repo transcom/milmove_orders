@@ -44,6 +44,9 @@ func NewMilmoveOrdersAPI(spec *loads.Document) *MilmoveOrdersAPI {
 		GetOrdersByIssuerAndOrdersNumHandler: GetOrdersByIssuerAndOrdersNumHandlerFunc(func(params GetOrdersByIssuerAndOrdersNumParams) middleware.Responder {
 			return middleware.NotImplemented("operation ordersoperations.GetOrdersByIssuerAndOrdersNum has not yet been implemented")
 		}),
+		GetOrdersCountHandler: GetOrdersCountHandlerFunc(func(params GetOrdersCountParams) middleware.Responder {
+			return middleware.NotImplemented("operation ordersoperations.GetOrdersCount has not yet been implemented")
+		}),
 		IndexOrdersForMemberHandler: IndexOrdersForMemberHandlerFunc(func(params IndexOrdersForMemberParams) middleware.Responder {
 			return middleware.NotImplemented("operation ordersoperations.IndexOrdersForMember has not yet been implemented")
 		}),
@@ -88,6 +91,8 @@ type MilmoveOrdersAPI struct {
 	GetOrdersHandler GetOrdersHandler
 	// GetOrdersByIssuerAndOrdersNumHandler sets the operation handler for the get orders by issuer and orders num operation
 	GetOrdersByIssuerAndOrdersNumHandler GetOrdersByIssuerAndOrdersNumHandler
+	// GetOrdersCountHandler sets the operation handler for the get orders count operation
+	GetOrdersCountHandler GetOrdersCountHandler
 	// IndexOrdersForMemberHandler sets the operation handler for the index orders for member operation
 	IndexOrdersForMemberHandler IndexOrdersForMemberHandler
 	// PostRevisionHandler sets the operation handler for the post revision operation
@@ -166,6 +171,10 @@ func (o *MilmoveOrdersAPI) Validate() error {
 
 	if o.GetOrdersByIssuerAndOrdersNumHandler == nil {
 		unregistered = append(unregistered, "Ordersoperations.GetOrdersByIssuerAndOrdersNumHandler")
+	}
+
+	if o.GetOrdersCountHandler == nil {
+		unregistered = append(unregistered, "Ordersoperations.GetOrdersCountHandler")
 	}
 
 	if o.IndexOrdersForMemberHandler == nil {
@@ -281,6 +290,11 @@ func (o *MilmoveOrdersAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/issuers/{issuer}/orders/{ordersNum}"] = NewGetOrdersByIssuerAndOrdersNum(o.context, o.GetOrdersByIssuerAndOrdersNumHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/issuers/{issuer}/count"] = NewGetOrdersCount(o.context, o.GetOrdersCountHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
