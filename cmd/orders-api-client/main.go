@@ -73,6 +73,16 @@ func main() {
 	initGetOrdersFlags(getOrdersCommand.Flags())
 	root.AddCommand(getOrdersCommand)
 
+	getOrdersCountCommand := &cobra.Command{
+		Use:          "get-orders-count",
+		Short:        "Gets Orders Count",
+		Long:         "Gets Orders Count by Issuer",
+		RunE:         getOrdersCount,
+		SilenceUsage: true,
+	}
+	initGetOrdersCountFlags(getOrdersCountCommand.Flags())
+	root.AddCommand(getOrdersCountCommand)
+
 	postRevisionsCommand := &cobra.Command{
 		Use:          "post-revisions",
 		Short:        "Post Revisions",

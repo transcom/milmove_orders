@@ -43,6 +43,11 @@ func configureAPI(api *ordersoperations.MilmoveOrdersAPI) http.Handler {
 			return middleware.NotImplemented("operation ordersoperations.GetOrdersByIssuerAndOrdersNum has not yet been implemented")
 		})
 	}
+	if api.GetOrdersCountHandler == nil {
+		api.GetOrdersCountHandler = ordersoperations.GetOrdersCountHandlerFunc(func(params ordersoperations.GetOrdersCountParams) middleware.Responder {
+			return middleware.NotImplemented("operation ordersoperations.GetOrdersCount has not yet been implemented")
+		})
+	}
 	if api.IndexOrdersForMemberHandler == nil {
 		api.IndexOrdersForMemberHandler = ordersoperations.IndexOrdersForMemberHandlerFunc(func(params ordersoperations.IndexOrdersForMemberParams) middleware.Responder {
 			return middleware.NotImplemented("operation ordersoperations.IndexOrdersForMember has not yet been implemented")

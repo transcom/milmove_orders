@@ -51,6 +51,21 @@ $ orders-api-client get-orders --orders-uuid ${UUID}
 
 As output the command will provide a record as returned from the server.
 
+### Get Orders Count
+
+The `orders-api-client get-orders-count` command uses an issuer to fetch the number of orders ingested from the
+Order API. This can be used as a quick way to validate that records have been uploaded. Example usage is as follows:
+
+```sh
+$ orders-api-client get-orders-count --issuer navy
+```
+
+The output is a JSON structure with the count and the issuer:
+
+```json
+{"count":7,"issuer":"navy"}
+```
+
 ### Post Revisions
 
 The `orders-api-client post-revisions` command ingests CSV files containing orders information and makes updates to the

@@ -144,3 +144,35 @@ func (suite *ModelSuite) TestFetchElectronicOrdersByEdipiAndIssuers() {
 	suite.Contains(ordersnumbers, retrievedOrders[1].OrdersNumber)
 	suite.NotEqual(retrievedOrders[0].OrdersNumber, retrievedOrders[1].OrdersNumber)
 }
+
+func (suite *ModelSuite) TestFetchElectronicOrdersCountByIssuer() {
+	edipi := "1234567890"
+	newOrder1 := models.ElectronicOrder{
+		Edipi:        edipi,
+		Issuer:       models.IssuerArmy,
+		OrdersNumber: "8675309",
+	}
+
+	ctx := context.Background()
+	verrs, err := models.CreateElectronicOrder(ctx, suite.DB(), &newOrder1)
+	suite.NoError(err)
+	suite.NoVerrs(verrs)
+
+	newOrder2 := models.ElectronicOrder{
+		Edipi:        edipi,
+		Issuer:       models.IssuerAirForce,
+		OrdersNumber: "5551234",
+	}
+
+	verrs, err = models.CreateElectronicOrder(ctx, suite.DB(), &newOrder2)
+	suite.NoError(err)
+	suite.NoVerrs(verrs)
+
+	countArmy, err := models.FetchElectronicOrderCountByIssuer(suite.DB(), string(models.IssuerArmy))
+	suite.NoError(err)
+	suite.Equal(countArmy, 1)
+
+	countAirForce, err := models.FetchElectronicOrderCountByIssuer(suite.DB(), string(models.IssuerAirForce))
+	suite.NoError(err)
+	suite.Equal(countAirForce, 1)
+}

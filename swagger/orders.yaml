@@ -41,6 +41,45 @@ paths:
           description: No orders found
         '500':
           description: Server error
+  '/issuers/{issuer}/count':
+    get:
+      summary: Retrieve a count of Orders by issuer
+      description: >-
+        Gets a Count of Orders by issuer.
+
+        ## Errors
+
+        Users of this endpoint must have permission to read Orders for
+        the `issuer` associated with the Orders. If not, this endpoint will
+        return `403 Forbidden`.
+      operationId: getOrdersCount
+      produces:
+        - application/json
+      parameters:
+        - name: issuer
+          in: path
+          description: Organization that issued the Orders.
+          required: true
+          type: string
+          enum:
+            - army
+            - navy
+            - air-force
+            - marine-corps
+            - coast-guard
+      responses:
+        '200':
+          description: Successful
+          schema:
+            $ref: '#/definitions/OrdersCount'
+        '400':
+          description: Invalid
+        '401':
+          description: must be authenticated to use this endpoint
+        '403':
+          description: Forbidden
+        '500':
+          description: Server error
   '/issuers/{issuer}/orders/{ordersNum}':
     get:
       summary: Retrieve orders by issuer and orders number
@@ -812,3 +851,16 @@ definitions:
         type: string
         description: 'In the USA, this is the ZIP Code.'
         x-nullable: true
+  OrdersCount:
+    type: object
+    properties:
+      count:
+        type: integer
+        minimum: 0
+        description: >
+          The number of orders in the DB by issuer.
+      issuer:
+        $ref: '#/definitions/Issuer'
+    required:
+      - count
+      - issuer

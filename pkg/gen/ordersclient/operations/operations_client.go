@@ -31,6 +31,8 @@ type ClientService interface {
 
 	GetOrdersByIssuerAndOrdersNum(params *GetOrdersByIssuerAndOrdersNumParams) (*GetOrdersByIssuerAndOrdersNumOK, error)
 
+	GetOrdersCount(params *GetOrdersCountParams) (*GetOrdersCountOK, error)
+
 	IndexOrdersForMember(params *IndexOrdersForMemberParams) (*IndexOrdersForMemberOK, error)
 
 	PostRevision(params *PostRevisionParams) (*PostRevisionCreated, error)
@@ -115,6 +117,44 @@ func (a *Client) GetOrdersByIssuerAndOrdersNum(params *GetOrdersByIssuerAndOrder
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for getOrdersByIssuerAndOrdersNum: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  GetOrdersCount retrieves a count of orders by issuer
+
+  Gets a Count of Orders by issuer.
+## Errors
+Users of this endpoint must have permission to read Orders for the `issuer` associated with the Orders. If not, this endpoint will return `403 Forbidden`.
+*/
+func (a *Client) GetOrdersCount(params *GetOrdersCountParams) (*GetOrdersCountOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetOrdersCountParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getOrdersCount",
+		Method:             "GET",
+		PathPattern:        "/issuers/{issuer}/count",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetOrdersCountReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetOrdersCountOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getOrdersCount: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

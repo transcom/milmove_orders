@@ -169,3 +169,12 @@ func FetchElectronicOrdersByEdipiAndIssuers(db *pop.Connection, edipi string, is
 	}
 	return ordersPtrs, err
 }
+
+// FetchElectronicOrderCountByIssuer counts the number of orders by issuer
+func FetchElectronicOrderCountByIssuer(db *pop.Connection, issuer string) (int, error) {
+	count, err := db.Q().Where("issuer = $1", issuer).Count(ElectronicOrder{})
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}

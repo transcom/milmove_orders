@@ -30,7 +30,7 @@ dev_exec: ## Attach to the development environment if running
 
 .PHONY: dev_logs
 dev_logs: ## Follow the logs from the server
-	docker-compose -f docker-compose.dev.yml logs -f dev
+	docker-compose -f docker-compose.dev.yml logs -f --tail=100 dev
 
 .PHONY: dev_destroy
 dev_destroy: ## Destroy development environment
