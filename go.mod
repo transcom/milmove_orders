@@ -3,7 +3,7 @@ module github.com/transcom/milmove_orders
 go 1.14
 
 require (
-	github.com/aws/aws-sdk-go v1.29.22
+	github.com/aws/aws-sdk-go v1.29.23
 	github.com/codegangsta/gin v0.0.0-20171026143024-cafe2ce98974
 	github.com/go-openapi/errors v0.19.4
 	github.com/go-openapi/loads v0.19.5
@@ -34,7 +34,7 @@ require (
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/objx v0.2.0
 	github.com/stretchr/testify v1.5.1
-	github.com/transcom/mymove v0.0.0-20200312181511-7e6bac4e3c91
+	github.com/transcom/mymove v0.0.0-20200313204145-d3eca0002421
 	go.uber.org/zap v1.14.0
 	goji.io v2.0.2+incompatible
 	golang.org/x/mod v0.2.0 // indirect

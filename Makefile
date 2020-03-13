@@ -22,7 +22,15 @@ help: ## Print the help documentation
 .PHONY: dev
 dev: ## Start development environment
 	docker-compose -f docker-compose.dev.yml build --pull
-	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.dev.yml run --service-ports --rm --name orders_dev dev bash
+	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.dev.yml up -d
+
+.PHONY: dev_exec
+dev_exec: ## Attach to the development environment if running
+	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.dev.yml exec dev /bin/bash
+
+.PHONY: dev_logs
+dev_logs: ## Follow the logs from the server
+	docker-compose -f docker-compose.dev.yml logs -f dev
 
 .PHONY: dev_destroy
 dev_destroy: ## Destroy development environment
@@ -129,11 +137,11 @@ server_run:
 # Note: Gin is not being used as a proxy so assigning odd port and laddr to keep in IPv4 space.
 # Note: The INTERFACE envar is set to configure the gin build, orders_gin, local IP4 space with default port GIN_PORT.
 server_run_default: check_log_dir bin/gin server_generate db_dev_run
-	INTERFACE=localhost DEBUG_LOGGING=true \
+	DEBUG_LOGGING=true \
 	$(AWS_VAULT) ./bin/gin \
 		--build ./cmd/orders \
 		--bin /bin/orders_gin \
-		--laddr 127.0.0.1 --port "$(GIN_PORT)" \
+		--laddr 0.0.0.0 --port "$(GIN_PORT)" \
 		--excludeDir node_modules \
 		--immediate \
 		--buildArgs "-i -ldflags=\"$(WEBSERVER_LDFLAGS)\"" \

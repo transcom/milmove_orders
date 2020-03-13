@@ -19,6 +19,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+    entrypoint: make server_run
     links:
       - database
     ports:
@@ -62,6 +63,7 @@ services:
       - HISTFILESIZE=5000
       - HISTSIZE=5000
       - HTTP_ORDERS_SERVER_NAME=orderslocal
+      - INTERFACE=0.0.0.0
       - IWS_RBS_ENABLED=0
       - IWS_RBS_HOST=pkict.dmdc.osd.mil
       - MIGRATION_MANIFEST=/home/circleci/milmove_orders/migrations/orders/migrations_manifest.txt
@@ -75,9 +77,11 @@ services:
       - NO_TLS_PORT=7080
       - PGPASSWORD=mysecretpassword
       - SERVE_ORDERS=true
-      - TLS_ENABLED=0
+      - TLS_ENABLED=1
       - TLS_PORT=6443
       - TZ=UTC
+    extra_hosts:
+      - "orderslocal:127.0.0.1"
     volumes:
       - ./:/home/circleci/milmove_orders
     working_dir: /home/circleci/milmove_orders

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-openapi/strfmt"
-	"github.com/gofrs/uuid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -36,8 +35,8 @@ func checkGetOrdersConfig(v *viper.Viper, args []string, logger *log.Logger) err
 	ordersUUID := v.GetString(OrdersUUIDFlag)
 	if ordersUUID == "" {
 		return fmt.Errorf("An orders uuid must be provided")
-	} else if _, err := uuid.FromString(ordersUUID); err != nil {
-		return fmt.Errorf("Unable to parse uuid %q: %w", ordersUUID, err)
+	} else if !strfmt.IsUUID(ordersUUID) {
+		return fmt.Errorf("Unable to parse uuid %q", ordersUUID)
 	}
 
 	return nil

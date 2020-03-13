@@ -487,6 +487,7 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 	tlsEnabled := v.GetBool(cli.TLSListenerFlag)
 	var tlsServer *server.NamedServer
 	if tlsEnabled {
+		logger.Info("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", zap.String("FLAG", cli.InterfaceFlag), zap.String("ADDRESS", listenInterface))
 		tlsServer, err = server.CreateNamedServer(&server.CreateNamedServerInput{
 			Name:         "tls",
 			Host:         listenInterface,

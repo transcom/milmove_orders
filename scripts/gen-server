@@ -2,16 +2,6 @@
 
 set -eu -o pipefail
 
-# Ensure the latest image is being used
-if [ -n "${CIRCLECI+x}" ]; then
-  # In CircleCI the docker image has the binary installed
-  echo "CircleCI has swagger built in"
-else
-  # Locally we need to download the docker image to get the binary
-  image=milmove/circleci-docker:milmove-orders-de8333d340c6cc5bc7554c913a955aacfa0c4d2b
-  docker pull -q "${image}"
-fi
-
 # Remove the generated code
 gendir=./pkg/gen
 
@@ -19,15 +9,9 @@ gendir=./pkg/gen
 rm -rf $gendir
 mkdir -p $gendir
 
-# Depending on environment use the built-in swagger (docker) or use the docker image directly
+# Use the built-in swagger client built into docker
 swagger_func() {
-  if [ -n "${CIRCLECI+x}" ]; then
-    # In CircleCI the docker image has the binary installed
-    echo "RUNNING IN CIRCLECI"
-    /usr/local/bin/swagger "$@"
-  else
-    docker run --rm=true -v "${PWD}:${PWD}" -w "${PWD}" "${image}" swagger "$@"
-  fi
+  /usr/local/bin/swagger "$@"
 }
 
 # Capture all PIDs so we can do the work async
