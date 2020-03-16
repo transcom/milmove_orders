@@ -19,6 +19,14 @@ endif
 help: ## Print the help documentation
 	@grep -E '^[a-zA-Z\/_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+#
+# ----- END PREAMBLE -----
+#
+
+#
+# ----- START DEVELOPMENT TARGETS -----
+#
+
 .PHONY: dev_up
 dev_up: ## Start development environment
 	docker-compose -f docker-compose.dev.yml build --pull
@@ -46,7 +54,7 @@ clean: ## Clean all generated files
 	rm -rf ./log
 
 #
-# ----- END PREAMBLE -----
+# ----- END DEVELOPMENT TARGETS -----
 #
 
 #
