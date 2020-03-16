@@ -37,6 +37,12 @@ To destroy your development environment run:
 make dev_down
 ```
 
+**Note on AWS Credentials:** credentials are passed in when you run `make dev`. When credentials expire you simply
+exit the docker container with `Ctrl-C` and then `make dev` again. You will be prompted for your MFA token and then
+logged into your development environment with updated AWS credentials. It isn't necessary to do this for the running
+server since there is no case where the development server needs to talk to AWS. That means you do not need to do
+`make dev_reset` when the creds expire.
+
 ## Branch Builds
 
 Requirements:

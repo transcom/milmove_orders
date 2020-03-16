@@ -9,6 +9,10 @@ make dev_up
 make dev
 ```
 
+Credentials are only needed when calling `make dev` and not when starting the development server with `make dev_up`.
+If your AWS session token expires just drop out of the development environment and log back in. You will be prompted
+for your MFA token and then dropped back into your development environment with proper credentials.
+
 Alternatively you can invoke docker directly to get a similar result. Replace `CLITOOL` in the following command with
 a tool that requires access to AWS (like `aws` and `chamber`):
 
