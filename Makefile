@@ -19,22 +19,25 @@ endif
 help: ## Print the help documentation
 	@grep -E '^[a-zA-Z\/_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: dev
-dev: ## Start development environment
+.PHONY: dev_up
+dev_up: ## Start development environment
 	docker-compose -f docker-compose.dev.yml build --pull
 	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.dev.yml up -d
 
-.PHONY: dev_exec
-dev_exec: ## Attach to the development environment if running
+.PHONY: dev
+dev: ## Attach to the development environment if running
 	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.dev.yml exec dev /bin/bash
 
 .PHONY: dev_logs
 dev_logs: ## Follow the logs from the server
 	docker-compose -f docker-compose.dev.yml logs -f --tail=100 dev
 
-.PHONY: dev_destroy
-dev_destroy: ## Destroy development environment
+.PHONY: dev_down
+dev_down: ## Destroy development environment
 	docker-compose -f docker-compose.dev.yml down
+
+.PHONY: dev_reset
+dev_reset: dev_down dev_up ## Reset development environment
 
 .PHONY: clean
 clean: ## Clean all generated files
