@@ -65,6 +65,9 @@ func initServeFlags(flag *pflag.FlagSet) {
 	// Enable listeners
 	cli.InitListenerFlags(flag)
 
+	// Devlocal Auth config
+	cli.InitDevlocalFlags(flag)
+
 	// IWS
 	cli.InitIWSFlags(flag)
 
@@ -118,6 +121,19 @@ func checkServeConfig(v *viper.Viper, logger logger) error {
 
 	if err := cli.CheckPorts(v); err != nil {
 		return err
+	}
+
+	// Do not use cli.CheckDevlocal because it has more logic than needed here
+	if v.GetBool(cli.DevlocalAuthFlag) {
+		// Check against the Environment
+		allowedEnvironments := []string{
+			cli.EnvironmentDevelopment,
+			cli.EnvironmentTest,
+			cli.EnvironmentExperimental,
+		}
+		if environment := v.GetString(cli.EnvironmentFlag); !stringSliceContains(allowedEnvironments, environment) {
+			return errors.Errorf("Devlocal Auth cannot run in the '%s' environment, only in %v", environment, allowedEnvironments)
+		}
 	}
 
 	if err := cli.CheckIWS(v); err != nil {
@@ -465,6 +481,21 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 	root.Use(middleware.RequestLogger(logger))
 
 	site.Handle(pat.New("/*"), root)
+
+	if v.GetBool(cli.DevlocalAuthFlag) {
+		logger.Info("Enabling devlocal auth")
+
+		if stringSliceContains([]string{cli.EnvironmentTest, cli.EnvironmentDevelopment}, v.GetString(cli.EnvironmentFlag)) {
+			logger.Info("Adding devlocal CA to root CAs")
+			devlocalCAPath := v.GetString(cli.DevlocalCAFlag)
+			devlocalCa, readFileErr := ioutil.ReadFile(devlocalCAPath) // #nosec
+			if readFileErr != nil {
+				logger.Error(fmt.Sprintf("Unable to read devlocal CA from path %s", devlocalCAPath), zap.Error(readFileErr))
+			} else {
+				rootCAs.AppendCertsFromPEM(devlocalCa)
+			}
+		}
+	}
 
 	listenInterface := v.GetString(cli.InterfaceFlag)
 
