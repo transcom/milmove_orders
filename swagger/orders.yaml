@@ -67,6 +67,16 @@ paths:
             - air-force
             - marine-corps
             - coast-guard
+        - name: startDateTime
+          in: query
+          description: Search date-time start
+          type: string
+          format: date-time
+        - name: endDateTime
+          in: query
+          description: Search date-time end
+          type: string
+          format: date-time
       responses:
         '200':
           description: Successful
@@ -861,6 +871,16 @@ definitions:
           The number of orders in the DB by issuer.
       issuer:
         $ref: '#/definitions/Issuer'
+      startDateTime:
+        type: string
+        description: Search date-time start
+        format: date-time
+        example: '2020-03-01T13:19:56-04:00'
+      endDateTime:
+        type: string
+        description: Search date-time end
+        format: date-time
+        example: '2020-03-01T13:19:56-04:00'
     required:
       - count
       - issuer

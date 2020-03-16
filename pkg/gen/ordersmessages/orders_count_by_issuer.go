@@ -22,9 +22,17 @@ type OrdersCountByIssuer struct {
 	// Minimum: 0
 	Count *int64 `json:"count"`
 
+	// Search date-time end
+	// Format: date-time
+	EndDateTime strfmt.DateTime `json:"endDateTime,omitempty"`
+
 	// issuer
 	// Required: true
 	Issuer Issuer `json:"issuer"`
+
+	// Search date-time start
+	// Format: date-time
+	StartDateTime strfmt.DateTime `json:"startDateTime,omitempty"`
 }
 
 // Validate validates this orders count by issuer
@@ -35,7 +43,15 @@ func (m *OrdersCountByIssuer) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateEndDateTime(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateIssuer(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateStartDateTime(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -58,12 +74,38 @@ func (m *OrdersCountByIssuer) validateCount(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *OrdersCountByIssuer) validateEndDateTime(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.EndDateTime) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("endDateTime", "body", "date-time", m.EndDateTime.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *OrdersCountByIssuer) validateIssuer(formats strfmt.Registry) error {
 
 	if err := m.Issuer.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("issuer")
 		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *OrdersCountByIssuer) validateStartDateTime(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.StartDateTime) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("startDateTime", "body", "date-time", m.StartDateTime.String(), formats); err != nil {
 		return err
 	}
 

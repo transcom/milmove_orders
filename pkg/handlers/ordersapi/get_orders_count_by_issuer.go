@@ -31,7 +31,7 @@ func (h GetOrdersCountByIssuerHandler) Handle(params ordersoperations.GetOrdersC
 		return handlers.ResponseForError(logger, errors.WithMessage(models.ErrFetchForbidden, "Not permitted to access this API"))
 	}
 
-	count, err := models.FetchElectronicOrderCountByIssuer(h.DB(), params.Issuer)
+	ordersCountByIssuer, err := models.FetchElectronicOrderCountByIssuer(h.DB(), params.Issuer)
 	if err != nil {
 		return handlers.ResponseForError(logger, err)
 	}
@@ -40,10 +40,11 @@ func (h GetOrdersCountByIssuerHandler) Handle(params ordersoperations.GetOrdersC
 		return handlers.ResponseForError(logger, errors.WithMessage(models.ErrFetchForbidden, "Not permitted to read Orders from this issuer"))
 	}
 
-	count64 := int64(count)
 	ordersCountByIssuerPayload := &ordersmessages.OrdersCountByIssuer{
-		Issuer: ordersmessages.Issuer(params.Issuer),
-		Count:  &count64,
+		Issuer:        ordersmessages.Issuer(params.Issuer),
+		Count:         &ordersCountByIssuer.Count,
+		StartDateTime: *handlers.FmtDateTimePtr(&ordersCountByIssuer.StartDateTime),
+		EndDateTime:   *handlers.FmtDateTimePtr(&ordersCountByIssuer.EndDateTime),
 	}
 
 	return ordersoperations.NewGetOrdersCountByIssuerOK().WithPayload(ordersCountByIssuerPayload)

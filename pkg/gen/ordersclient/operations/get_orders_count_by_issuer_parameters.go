@@ -61,11 +61,21 @@ for the get orders count by issuer operation typically these are written to a ht
 */
 type GetOrdersCountByIssuerParams struct {
 
+	/*EndDateTime
+	  Search date-time end
+
+	*/
+	EndDateTime *strfmt.DateTime
 	/*Issuer
 	  Organization that issued the Orders.
 
 	*/
 	Issuer string
+	/*StartDateTime
+	  Search date-time start
+
+	*/
+	StartDateTime *strfmt.DateTime
 
 	timeout    time.Duration
 	Context    context.Context
@@ -105,6 +115,17 @@ func (o *GetOrdersCountByIssuerParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithEndDateTime adds the endDateTime to the get orders count by issuer params
+func (o *GetOrdersCountByIssuerParams) WithEndDateTime(endDateTime *strfmt.DateTime) *GetOrdersCountByIssuerParams {
+	o.SetEndDateTime(endDateTime)
+	return o
+}
+
+// SetEndDateTime adds the endDateTime to the get orders count by issuer params
+func (o *GetOrdersCountByIssuerParams) SetEndDateTime(endDateTime *strfmt.DateTime) {
+	o.EndDateTime = endDateTime
+}
+
 // WithIssuer adds the issuer to the get orders count by issuer params
 func (o *GetOrdersCountByIssuerParams) WithIssuer(issuer string) *GetOrdersCountByIssuerParams {
 	o.SetIssuer(issuer)
@@ -116,6 +137,17 @@ func (o *GetOrdersCountByIssuerParams) SetIssuer(issuer string) {
 	o.Issuer = issuer
 }
 
+// WithStartDateTime adds the startDateTime to the get orders count by issuer params
+func (o *GetOrdersCountByIssuerParams) WithStartDateTime(startDateTime *strfmt.DateTime) *GetOrdersCountByIssuerParams {
+	o.SetStartDateTime(startDateTime)
+	return o
+}
+
+// SetStartDateTime adds the startDateTime to the get orders count by issuer params
+func (o *GetOrdersCountByIssuerParams) SetStartDateTime(startDateTime *strfmt.DateTime) {
+	o.StartDateTime = startDateTime
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *GetOrdersCountByIssuerParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -124,9 +156,41 @@ func (o *GetOrdersCountByIssuerParams) WriteToRequest(r runtime.ClientRequest, r
 	}
 	var res []error
 
+	if o.EndDateTime != nil {
+
+		// query param endDateTime
+		var qrEndDateTime strfmt.DateTime
+		if o.EndDateTime != nil {
+			qrEndDateTime = *o.EndDateTime
+		}
+		qEndDateTime := qrEndDateTime.String()
+		if qEndDateTime != "" {
+			if err := r.SetQueryParam("endDateTime", qEndDateTime); err != nil {
+				return err
+			}
+		}
+
+	}
+
 	// path param issuer
 	if err := r.SetPathParam("issuer", o.Issuer); err != nil {
 		return err
+	}
+
+	if o.StartDateTime != nil {
+
+		// query param startDateTime
+		var qrStartDateTime strfmt.DateTime
+		if o.StartDateTime != nil {
+			qrStartDateTime = *o.StartDateTime
+		}
+		qStartDateTime := qrStartDateTime.String()
+		if qStartDateTime != "" {
+			if err := r.SetQueryParam("startDateTime", qStartDateTime); err != nil {
+				return err
+			}
+		}
+
 	}
 
 	if len(res) > 0 {

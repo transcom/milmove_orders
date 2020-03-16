@@ -10,11 +10,16 @@ import (
 	"net/url"
 	golangswaggerpaths "path"
 	"strings"
+
+	"github.com/go-openapi/strfmt"
 )
 
 // GetOrdersCountByIssuerURL generates an URL for the get orders count by issuer operation
 type GetOrdersCountByIssuerURL struct {
 	Issuer string
+
+	EndDateTime   *strfmt.DateTime
+	StartDateTime *strfmt.DateTime
 
 	_basePath string
 	// avoid unkeyed usage
@@ -54,6 +59,26 @@ func (o *GetOrdersCountByIssuerURL) Build() (*url.URL, error) {
 		_basePath = "/orders/v1"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
+
+	qs := make(url.Values)
+
+	var endDateTimeQ string
+	if o.EndDateTime != nil {
+		endDateTimeQ = o.EndDateTime.String()
+	}
+	if endDateTimeQ != "" {
+		qs.Set("endDateTime", endDateTimeQ)
+	}
+
+	var startDateTimeQ string
+	if o.StartDateTime != nil {
+		startDateTimeQ = o.StartDateTime.String()
+	}
+	if startDateTimeQ != "" {
+		qs.Set("startDateTime", startDateTimeQ)
+	}
+
+	_result.RawQuery = qs.Encode()
 
 	return &_result, nil
 }

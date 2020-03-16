@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/validate"
 
@@ -31,11 +32,19 @@ type GetOrdersCountByIssuerParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
+	/*Search date-time end
+	  In: query
+	*/
+	EndDateTime *strfmt.DateTime
 	/*Organization that issued the Orders.
 	  Required: true
 	  In: path
 	*/
 	Issuer string
+	/*Search date-time start
+	  In: query
+	*/
+	StartDateTime *strfmt.DateTime
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -47,13 +56,61 @@ func (o *GetOrdersCountByIssuerParams) BindRequest(r *http.Request, route *middl
 
 	o.HTTPRequest = r
 
+	qs := runtime.Values(r.URL.Query())
+
+	qEndDateTime, qhkEndDateTime, _ := qs.GetOK("endDateTime")
+	if err := o.bindEndDateTime(qEndDateTime, qhkEndDateTime, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
 	rIssuer, rhkIssuer, _ := route.Params.GetOK("issuer")
 	if err := o.bindIssuer(rIssuer, rhkIssuer, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
+	qStartDateTime, qhkStartDateTime, _ := qs.GetOK("startDateTime")
+	if err := o.bindStartDateTime(qStartDateTime, qhkStartDateTime, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+// bindEndDateTime binds and validates parameter EndDateTime from query.
+func (o *GetOrdersCountByIssuerParams) bindEndDateTime(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	// Format: date-time
+	value, err := formats.Parse("date-time", raw)
+	if err != nil {
+		return errors.InvalidType("endDateTime", "query", "strfmt.DateTime", raw)
+	}
+	o.EndDateTime = (value.(*strfmt.DateTime))
+
+	if err := o.validateEndDateTime(formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateEndDateTime carries on validations for parameter EndDateTime
+func (o *GetOrdersCountByIssuerParams) validateEndDateTime(formats strfmt.Registry) error {
+
+	if err := validate.FormatOf("endDateTime", "query", "date-time", o.EndDateTime.String(), formats); err != nil {
+		return err
 	}
 	return nil
 }
@@ -84,5 +141,41 @@ func (o *GetOrdersCountByIssuerParams) validateIssuer(formats strfmt.Registry) e
 		return err
 	}
 
+	return nil
+}
+
+// bindStartDateTime binds and validates parameter StartDateTime from query.
+func (o *GetOrdersCountByIssuerParams) bindStartDateTime(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	// Format: date-time
+	value, err := formats.Parse("date-time", raw)
+	if err != nil {
+		return errors.InvalidType("startDateTime", "query", "strfmt.DateTime", raw)
+	}
+	o.StartDateTime = (value.(*strfmt.DateTime))
+
+	if err := o.validateStartDateTime(formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateStartDateTime carries on validations for parameter StartDateTime
+func (o *GetOrdersCountByIssuerParams) validateStartDateTime(formats strfmt.Registry) error {
+
+	if err := validate.FormatOf("startDateTime", "query", "date-time", o.StartDateTime.String(), formats); err != nil {
+		return err
+	}
 	return nil
 }

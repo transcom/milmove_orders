@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/gobuffalo/pop"
@@ -170,11 +171,23 @@ func FetchElectronicOrdersByEdipiAndIssuers(db *pop.Connection, edipi string, is
 	return ordersPtrs, err
 }
 
+// OrdersCountByIssuer continas the data about total number of orders and a start and end date-time for that count
+type OrdersCountByIssuer struct {
+	Count         int64     `db:"num"`
+	StartDateTime time.Time `db:"start"`
+	EndDateTime   time.Time `db:"end"`
+}
+
 // FetchElectronicOrderCountByIssuer counts the number of orders by issuer
-func FetchElectronicOrderCountByIssuer(db *pop.Connection, issuer string) (int, error) {
-	count, err := db.Q().Where("issuer = $1", issuer).Count(ElectronicOrder{})
+func FetchElectronicOrderCountByIssuer(db *pop.Connection, issuer string) (*OrdersCountByIssuer, error) {
+	ordersCount := []OrdersCountByIssuer{}
+	sql := `SELECT count(*) as num, min(created_at) as start, max(created_at) as end FROM electronic_orders WHERE issuer = $1;`
+
+	err := db.RawQuery(sql, issuer).All(&ordersCount)
+
 	if err != nil {
-		return 0, err
+		return nil, fmt.Errorf("Error fetching electronic orders count by issuer: %w", err)
 	}
-	return count, nil
+
+	return &ordersCount[0], nil
 }
