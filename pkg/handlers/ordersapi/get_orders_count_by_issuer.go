@@ -51,7 +51,7 @@ func (h GetOrdersCountByIssuerHandler) Handle(params ordersoperations.GetOrdersC
 
 	ordersCountByIssuerPayload := &ordersmessages.OrdersCountByIssuer{
 		Issuer:        ordersmessages.Issuer(params.Issuer),
-		Count:         &ordersCountByIssuer.Count,
+		Count:         ordersCountByIssuer,
 		StartDateTime: params.StartDateTime,
 		EndDateTime:   params.EndDateTime,
 	}

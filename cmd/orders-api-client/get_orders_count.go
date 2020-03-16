@@ -28,7 +28,7 @@ const (
 
 func initGetOrdersCountFlags(flag *pflag.FlagSet) {
 	flag.String(IssuerFlag, "navy", "The Issuer of the orders")
-	flag.Duration(RelativeTimeFlag, time.Hour*24, "The relative time to search backwards from when the command is invoked, set to 0 to disable")
+	flag.Duration(RelativeTimeFlag, time.Hour*24, "The relative time to search backwards from when the command is invoked, set to '-1m' to disable")
 	flag.String(StartTimestampFlag, "", "The Start time to search from, overrides relative-time search")
 	flag.String(EndTimestampFlag, "", "The End time to search to, overrides relative-time search")
 

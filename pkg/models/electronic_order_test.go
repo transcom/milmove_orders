@@ -170,9 +170,9 @@ func (suite *ModelSuite) TestFetchElectronicOrdersCountByIssuer() {
 
 	countArmy, err := models.FetchElectronicOrderCountByIssuer(suite.DB(), string(models.IssuerArmy), nil, nil)
 	suite.NoError(err)
-	suite.Equal(int64(1), countArmy.Count)
+	suite.Equal(int64(1), *countArmy)
 
 	countAirForce, err := models.FetchElectronicOrderCountByIssuer(suite.DB(), string(models.IssuerAirForce), nil, nil)
 	suite.NoError(err)
-	suite.Equal(int64(1), countAirForce.Count)
+	suite.Equal(int64(1), *countAirForce)
 }

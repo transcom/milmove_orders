@@ -171,43 +171,21 @@ func FetchElectronicOrdersByEdipiAndIssuers(db *pop.Connection, edipi string, is
 	return ordersPtrs, err
 }
 
-// OrdersCountByIssuer continas the data about total number of orders and a start and end date-time for that count
-type OrdersCountByIssuer struct {
-	Count int64 `db:"num"`
-}
-
 // FetchElectronicOrderCountByIssuer counts the number of orders by issuer
-func FetchElectronicOrderCountByIssuer(db *pop.Connection, issuer string, startDateTime, endDateTime *string) (*OrdersCountByIssuer, error) {
-	ordersCount := []OrdersCountByIssuer{}
-	var errQuery error
-	if startDateTime != nil && endDateTime != nil {
-		sql := `SELECT COUNT(*) AS num
-			FROM electronic_orders
-			WHERE issuer = $1
-			AND created_at BETWEEN $2 AND $3;`
-		errQuery = db.RawQuery(sql, issuer, *startDateTime, *endDateTime).All(&ordersCount)
-	} else if startDateTime != nil {
-		sql := `SELECT COUNT(*) AS num
-			FROM electronic_orders
-			WHERE issuer = $1
-			AND created_at >= $2;`
-		errQuery = db.RawQuery(sql, issuer, *startDateTime).All(&ordersCount)
-	} else if endDateTime != nil {
-		sql := `SELECT COUNT(*) AS num
-			FROM electronic_orders
-			WHERE issuer = $1
-			AND created_at <= $2;`
-		errQuery = db.RawQuery(sql, issuer, *endDateTime).All(&ordersCount)
-	} else {
-		sql := `SELECT COUNT(*) AS num
-			FROM electronic_orders
-			WHERE issuer = $1;`
-		errQuery = db.RawQuery(sql, issuer).All(&ordersCount)
+func FetchElectronicOrderCountByIssuer(db *pop.Connection, issuer string, startDateTime, endDateTime *string) (*int64, error) {
+
+	query := db.Q().Where("issuer = ?", issuer)
+	if startDateTime != nil {
+		query = query.Where("created_at >= ?::timestamp", *startDateTime)
 	}
+	if endDateTime != nil {
+		query = query.Where("created_at <= ?::timestamp", *endDateTime)
+	}
+	ct, errQuery := query.Count(ElectronicOrder{})
 
 	if errQuery != nil {
 		return nil, fmt.Errorf("Error fetching electronic orders count by issuer: %w", errQuery)
 	}
-
-	return &ordersCount[0], nil
+	count := int64(ct)
+	return &count, nil
 }
