@@ -83,7 +83,7 @@ func init() {
           "application/json"
         ],
         "summary": "Retrieve a count of Orders by issuer",
-        "operationId": "getOrdersCount",
+        "operationId": "getOrdersCountByIssuer",
         "parameters": [
           {
             "enum": [
@@ -104,7 +104,7 @@ func init() {
           "200": {
             "description": "Successful",
             "schema": {
-              "$ref": "#/definitions/OrdersCount"
+              "$ref": "#/definitions/OrdersCountByIssuer"
             }
           },
           "400": {
@@ -484,7 +484,7 @@ func init() {
         }
       }
     },
-    "OrdersCount": {
+    "OrdersCountByIssuer": {
       "type": "object",
       "required": [
         "count",
@@ -820,7 +820,7 @@ func init() {
           "application/json"
         ],
         "summary": "Retrieve a count of Orders by issuer",
-        "operationId": "getOrdersCount",
+        "operationId": "getOrdersCountByIssuer",
         "parameters": [
           {
             "enum": [
@@ -841,7 +841,7 @@ func init() {
           "200": {
             "description": "Successful",
             "schema": {
-              "$ref": "#/definitions/OrdersCount"
+              "$ref": "#/definitions/OrdersCountByIssuer"
             }
           },
           "400": {
@@ -1221,7 +1221,7 @@ func init() {
         }
       }
     },
-    "OrdersCount": {
+    "OrdersCountByIssuer": {
       "type": "object",
       "required": [
         "count",

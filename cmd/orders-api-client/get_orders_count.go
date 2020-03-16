@@ -70,10 +70,10 @@ func getOrdersCount(cmd *cobra.Command, args []string) error {
 		defer func() { _ = cacStore.Close() }()
 	}
 
-	var params ordersOperations.GetOrdersCountParams
+	var params ordersOperations.GetOrdersCountByIssuerParams
 	params.SetIssuer(v.GetString(IssuerFlag))
 	params.SetTimeout(time.Second * 30)
-	resp, errGetOrdersCount := ordersGateway.Operations.GetOrdersCount(&params)
+	resp, errGetOrdersCount := ordersGateway.Operations.GetOrdersCountByIssuer(&params)
 	if errGetOrdersCount != nil {
 		// If the response cannot be parsed as JSON you may see an error like
 		// is not supported by the TextConsumer, can be resolved by supporting TextUnmarshaler interface

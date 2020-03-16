@@ -47,6 +47,14 @@ dev_down: ## Destroy development environment
 .PHONY: dev_reset
 dev_reset: dev_down dev_up ## Reset development environment
 
+.PHONY: dev_reset_db
+dev_reset_db: ## Reset running db
+	docker-compose -f docker-compose.dev.yml restart db
+
+.PHONY: dev_reset_server
+dev_reset_server: ## Reset running server
+	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.dev.yml restart dev
+
 .PHONY: clean
 clean: ## Clean all generated files
 	rm -rf ./bin

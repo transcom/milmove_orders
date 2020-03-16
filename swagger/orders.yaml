@@ -52,7 +52,7 @@ paths:
         Users of this endpoint must have permission to read Orders for
         the `issuer` associated with the Orders. If not, this endpoint will
         return `403 Forbidden`.
-      operationId: getOrdersCount
+      operationId: getOrdersCountByIssuer
       produces:
         - application/json
       parameters:
@@ -71,7 +71,7 @@ paths:
         '200':
           description: Successful
           schema:
-            $ref: '#/definitions/OrdersCount'
+            $ref: '#/definitions/OrdersCountByIssuer'
         '400':
           description: Invalid
         '401':
@@ -851,7 +851,7 @@ definitions:
         type: string
         description: 'In the USA, this is the ZIP Code.'
         x-nullable: true
-  OrdersCount:
+  OrdersCountByIssuer:
     type: object
     properties:
       count:

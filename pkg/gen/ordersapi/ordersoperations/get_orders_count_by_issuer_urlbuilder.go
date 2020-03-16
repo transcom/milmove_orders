@@ -12,8 +12,8 @@ import (
 	"strings"
 )
 
-// GetOrdersCountURL generates an URL for the get orders count operation
-type GetOrdersCountURL struct {
+// GetOrdersCountByIssuerURL generates an URL for the get orders count by issuer operation
+type GetOrdersCountByIssuerURL struct {
 	Issuer string
 
 	_basePath string
@@ -24,7 +24,7 @@ type GetOrdersCountURL struct {
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetOrdersCountURL) WithBasePath(bp string) *GetOrdersCountURL {
+func (o *GetOrdersCountByIssuerURL) WithBasePath(bp string) *GetOrdersCountByIssuerURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -32,12 +32,12 @@ func (o *GetOrdersCountURL) WithBasePath(bp string) *GetOrdersCountURL {
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetOrdersCountURL) SetBasePath(bp string) {
+func (o *GetOrdersCountByIssuerURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *GetOrdersCountURL) Build() (*url.URL, error) {
+func (o *GetOrdersCountByIssuerURL) Build() (*url.URL, error) {
 	var _result url.URL
 
 	var _path = "/issuers/{issuer}/count"
@@ -46,7 +46,7 @@ func (o *GetOrdersCountURL) Build() (*url.URL, error) {
 	if issuer != "" {
 		_path = strings.Replace(_path, "{issuer}", issuer, -1)
 	} else {
-		return nil, errors.New("issuer is required on GetOrdersCountURL")
+		return nil, errors.New("issuer is required on GetOrdersCountByIssuerURL")
 	}
 
 	_basePath := o._basePath
@@ -59,7 +59,7 @@ func (o *GetOrdersCountURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *GetOrdersCountURL) Must(u *url.URL, err error) *url.URL {
+func (o *GetOrdersCountByIssuerURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -70,17 +70,17 @@ func (o *GetOrdersCountURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *GetOrdersCountURL) String() string {
+func (o *GetOrdersCountByIssuerURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *GetOrdersCountURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *GetOrdersCountByIssuerURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on GetOrdersCountURL")
+		return nil, errors.New("scheme is required for a full url on GetOrdersCountByIssuerURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on GetOrdersCountURL")
+		return nil, errors.New("host is required for a full url on GetOrdersCountByIssuerURL")
 	}
 
 	base, err := o.Build()
@@ -94,6 +94,6 @@ func (o *GetOrdersCountURL) BuildFull(scheme, host string) (*url.URL, error) {
 }
 
 // StringFull returns the string representation of a complete url
-func (o *GetOrdersCountURL) StringFull(scheme, host string) string {
+func (o *GetOrdersCountByIssuerURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }
