@@ -14,25 +14,30 @@ orbs:
   aws-ecr: circleci/aws-ecr@6.7.0
   slack: circleci/slack@3.4.2
 
+# References for variables shared across the file
+references:
+  circleci-docker: &circleci-docker milmove/circleci-docker:milmove-orders-de8333d340c6cc5bc7554c913a955aacfa0c4d2b
+  postgres: &postgres postgres:10.10
+
 executors:
   # `milmove_orders_small` and `milmove_orders_medium` use the `milmove/circleci-docker` docker image with a checkout of the milmove_orders code
   milmove_orders_small:
     resource_class: small
     working_directory: ~/milmove_orders
     docker:
-      - image: milmove/circleci-docker:milmove-orders-de8333d340c6cc5bc7554c913a955aacfa0c4d2b
+      - image: *circleci-docker
   milmove_orders_medium:
     resource_class: medium
     working_directory: ~/milmove_orders
     docker:
-      - image: milmove/circleci-docker:milmove-orders-de8333d340c6cc5bc7554c913a955aacfa0c4d2b
+      - image: *circleci-docker
   # `milmove_orders_and_postgres_medium` adds a secondary postgres container to be used during testing.
   milmove_orders_and_postgres_medium:
     resource_class: medium
     working_directory: ~/milmove_orders
     docker:
-      - image: milmove/circleci-docker:milmove-orders-de8333d340c6cc5bc7554c913a955aacfa0c4d2b
-      - image: postgres:10.10
+      - image: *circleci-docker
+      - image: *postgres
         environment:
           - POSTGRES_PASSWORD: mysecretpassword
           - POSTGRES_DB: test_db
