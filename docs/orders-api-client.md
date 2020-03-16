@@ -128,7 +128,7 @@ Because the BUPERS Orders Number contains PII (the SSN) and could potentially no
 
 #### Modification number interpretation
 
-The Orders API has a sequence number to indicate the chronology of amendments to a set of Orders. The input, however, has two modification number fields, which track the modification count from different systems. Fortunately, these two fields increment atomically, and never decrement.
+The Orders API has a sequence number to indicate the chronology of amendments to a set of Orders. The input, however, has two modification number fields (Order Modifications Number and Obligation Modification Number), which track the modification count from different systems. Fortunately, these two fields increment atomically, and never decrement.
 
 Therefore, the sequence number is simply the sum of these two numbers.
 

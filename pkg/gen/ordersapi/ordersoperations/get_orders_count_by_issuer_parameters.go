@@ -15,18 +15,18 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// NewGetOrdersCountParams creates a new GetOrdersCountParams object
+// NewGetOrdersCountByIssuerParams creates a new GetOrdersCountByIssuerParams object
 // no default values defined in spec.
-func NewGetOrdersCountParams() GetOrdersCountParams {
+func NewGetOrdersCountByIssuerParams() GetOrdersCountByIssuerParams {
 
-	return GetOrdersCountParams{}
+	return GetOrdersCountByIssuerParams{}
 }
 
-// GetOrdersCountParams contains all the bound params for the get orders count operation
+// GetOrdersCountByIssuerParams contains all the bound params for the get orders count by issuer operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters getOrdersCount
-type GetOrdersCountParams struct {
+// swagger:parameters getOrdersCountByIssuer
+type GetOrdersCountByIssuerParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -41,8 +41,8 @@ type GetOrdersCountParams struct {
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewGetOrdersCountParams() beforehand.
-func (o *GetOrdersCountParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewGetOrdersCountByIssuerParams() beforehand.
+func (o *GetOrdersCountByIssuerParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -59,7 +59,7 @@ func (o *GetOrdersCountParams) BindRequest(r *http.Request, route *middleware.Ma
 }
 
 // bindIssuer binds and validates parameter Issuer from path.
-func (o *GetOrdersCountParams) bindIssuer(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *GetOrdersCountByIssuerParams) bindIssuer(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -78,7 +78,7 @@ func (o *GetOrdersCountParams) bindIssuer(rawData []string, hasKey bool, formats
 }
 
 // validateIssuer carries on validations for parameter Issuer
-func (o *GetOrdersCountParams) validateIssuer(formats strfmt.Registry) error {
+func (o *GetOrdersCountByIssuerParams) validateIssuer(formats strfmt.Registry) error {
 
 	if err := validate.Enum("issuer", "path", o.Issuer, []interface{}{"army", "navy", "air-force", "marine-corps", "coast-guard"}); err != nil {
 		return err

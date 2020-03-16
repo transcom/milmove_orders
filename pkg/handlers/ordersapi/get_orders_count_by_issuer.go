@@ -11,13 +11,13 @@ import (
 	"github.com/transcom/milmove_orders/pkg/models"
 )
 
-// GetOrdersCountHandler returns Orders Count by issuer
-type GetOrdersCountHandler struct {
+// GetOrdersCountByIssuerHandler returns Orders Count by Issuer
+type GetOrdersCountByIssuerHandler struct {
 	handlers.HandlerContext
 }
 
-// Handle (GetOrdersCountHandler) responds to GET /orders/{issuer}/count
-func (h GetOrdersCountHandler) Handle(params ordersoperations.GetOrdersCountParams) middleware.Responder {
+// Handle (GetOrdersCountByIssuerHandler) responds to GET /orders/{issuer}/count
+func (h GetOrdersCountByIssuerHandler) Handle(params ordersoperations.GetOrdersCountByIssuerParams) middleware.Responder {
 
 	ctx := params.HTTPRequest.Context()
 
@@ -41,10 +41,10 @@ func (h GetOrdersCountHandler) Handle(params ordersoperations.GetOrdersCountPara
 	}
 
 	count64 := int64(count)
-	ordersCountPayload := &ordersmessages.OrdersCount{
+	ordersCountByIssuerPayload := &ordersmessages.OrdersCountByIssuer{
 		Issuer: ordersmessages.Issuer(params.Issuer),
 		Count:  &count64,
 	}
 
-	return ordersoperations.NewGetOrdersCountOK().WithPayload(ordersCountPayload)
+	return ordersoperations.NewGetOrdersCountByIssuerOK().WithPayload(ordersCountByIssuerPayload)
 }

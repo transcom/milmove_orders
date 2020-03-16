@@ -22,16 +22,16 @@ func (suite *HandlerSuite) TestGetOrdersCountByIssuerSuccess() {
 	}
 	req = suite.AuthenticateClientCertRequest(req, &clientCert)
 
-	params := ordersoperations.GetOrdersCountParams{
+	params := ordersoperations.GetOrdersCountByIssuerParams{
 		HTTPRequest: req,
 		Issuer:      string(order.Issuer),
 	}
 
-	handler := GetOrdersCountHandler{handlers.NewHandlerContext(suite.DB(), suite.TestLogger())}
+	handler := GetOrdersCountByIssuerHandler{handlers.NewHandlerContext(suite.DB(), suite.TestLogger())}
 	response := handler.Handle(params)
 
-	suite.Assertions.IsType(&ordersoperations.GetOrdersCountOK{}, response)
-	okResponse, ok := response.(*ordersoperations.GetOrdersCountOK)
+	suite.Assertions.IsType(&ordersoperations.GetOrdersCountByIssuerOK{}, response)
+	okResponse, ok := response.(*ordersoperations.GetOrdersCountByIssuerOK)
 	if !ok {
 		return
 	}
@@ -44,12 +44,12 @@ func (suite *HandlerSuite) TestGetOrdersCountByIssuerNoApiPerm() {
 	clientCert := models.ClientCert{}
 	req = suite.AuthenticateClientCertRequest(req, &clientCert)
 
-	params := ordersoperations.GetOrdersCountParams{
+	params := ordersoperations.GetOrdersCountByIssuerParams{
 		HTTPRequest: req,
 		Issuer:      string(models.IssuerAirForce),
 	}
 
-	handler := GetOrdersCountHandler{handlers.NewHandlerContext(suite.DB(), suite.TestLogger())}
+	handler := GetOrdersCountByIssuerHandler{handlers.NewHandlerContext(suite.DB(), suite.TestLogger())}
 	response := handler.Handle(params)
 
 	suite.IsType(&handlers.ErrResponse{}, response)
@@ -103,12 +103,12 @@ func (suite *HandlerSuite) TestGetOrdersCountByIssuerReadPerms() {
 			req := httptest.NewRequest("GET", fmt.Sprintf("/orders/v1/issuers/%s/count", string(order.Issuer)), nil)
 			req = suite.AuthenticateClientCertRequest(req, testCase.cert)
 
-			params := ordersoperations.GetOrdersCountParams{
+			params := ordersoperations.GetOrdersCountByIssuerParams{
 				HTTPRequest: req,
 				Issuer:      string(order.Issuer),
 			}
 
-			handler := GetOrdersCountHandler{handlers.NewHandlerContext(suite.DB(), suite.TestLogger())}
+			handler := GetOrdersCountByIssuerHandler{handlers.NewHandlerContext(suite.DB(), suite.TestLogger())}
 			response := handler.Handle(params)
 
 			suite.IsType(&handlers.ErrResponse{}, response)

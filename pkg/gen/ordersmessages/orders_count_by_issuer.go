@@ -12,9 +12,9 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// OrdersCount orders count
-// swagger:model OrdersCount
-type OrdersCount struct {
+// OrdersCountByIssuer orders count by issuer
+// swagger:model OrdersCountByIssuer
+type OrdersCountByIssuer struct {
 
 	// The number of orders in the DB by issuer.
 	//
@@ -27,8 +27,8 @@ type OrdersCount struct {
 	Issuer Issuer `json:"issuer"`
 }
 
-// Validate validates this orders count
-func (m *OrdersCount) Validate(formats strfmt.Registry) error {
+// Validate validates this orders count by issuer
+func (m *OrdersCountByIssuer) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateCount(formats); err != nil {
@@ -45,7 +45,7 @@ func (m *OrdersCount) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OrdersCount) validateCount(formats strfmt.Registry) error {
+func (m *OrdersCountByIssuer) validateCount(formats strfmt.Registry) error {
 
 	if err := validate.Required("count", "body", m.Count); err != nil {
 		return err
@@ -58,7 +58,7 @@ func (m *OrdersCount) validateCount(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OrdersCount) validateIssuer(formats strfmt.Registry) error {
+func (m *OrdersCountByIssuer) validateIssuer(formats strfmt.Registry) error {
 
 	if err := m.Issuer.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -71,7 +71,7 @@ func (m *OrdersCount) validateIssuer(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *OrdersCount) MarshalBinary() ([]byte, error) {
+func (m *OrdersCountByIssuer) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -79,8 +79,8 @@ func (m *OrdersCount) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *OrdersCount) UnmarshalBinary(b []byte) error {
-	var res OrdersCount
+func (m *OrdersCountByIssuer) UnmarshalBinary(b []byte) error {
+	var res OrdersCountByIssuer
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

@@ -44,8 +44,8 @@ func NewMilmoveOrdersAPI(spec *loads.Document) *MilmoveOrdersAPI {
 		GetOrdersByIssuerAndOrdersNumHandler: GetOrdersByIssuerAndOrdersNumHandlerFunc(func(params GetOrdersByIssuerAndOrdersNumParams) middleware.Responder {
 			return middleware.NotImplemented("operation ordersoperations.GetOrdersByIssuerAndOrdersNum has not yet been implemented")
 		}),
-		GetOrdersCountHandler: GetOrdersCountHandlerFunc(func(params GetOrdersCountParams) middleware.Responder {
-			return middleware.NotImplemented("operation ordersoperations.GetOrdersCount has not yet been implemented")
+		GetOrdersCountByIssuerHandler: GetOrdersCountByIssuerHandlerFunc(func(params GetOrdersCountByIssuerParams) middleware.Responder {
+			return middleware.NotImplemented("operation ordersoperations.GetOrdersCountByIssuer has not yet been implemented")
 		}),
 		IndexOrdersForMemberHandler: IndexOrdersForMemberHandlerFunc(func(params IndexOrdersForMemberParams) middleware.Responder {
 			return middleware.NotImplemented("operation ordersoperations.IndexOrdersForMember has not yet been implemented")
@@ -91,8 +91,8 @@ type MilmoveOrdersAPI struct {
 	GetOrdersHandler GetOrdersHandler
 	// GetOrdersByIssuerAndOrdersNumHandler sets the operation handler for the get orders by issuer and orders num operation
 	GetOrdersByIssuerAndOrdersNumHandler GetOrdersByIssuerAndOrdersNumHandler
-	// GetOrdersCountHandler sets the operation handler for the get orders count operation
-	GetOrdersCountHandler GetOrdersCountHandler
+	// GetOrdersCountByIssuerHandler sets the operation handler for the get orders count by issuer operation
+	GetOrdersCountByIssuerHandler GetOrdersCountByIssuerHandler
 	// IndexOrdersForMemberHandler sets the operation handler for the index orders for member operation
 	IndexOrdersForMemberHandler IndexOrdersForMemberHandler
 	// PostRevisionHandler sets the operation handler for the post revision operation
@@ -173,8 +173,8 @@ func (o *MilmoveOrdersAPI) Validate() error {
 		unregistered = append(unregistered, "Ordersoperations.GetOrdersByIssuerAndOrdersNumHandler")
 	}
 
-	if o.GetOrdersCountHandler == nil {
-		unregistered = append(unregistered, "Ordersoperations.GetOrdersCountHandler")
+	if o.GetOrdersCountByIssuerHandler == nil {
+		unregistered = append(unregistered, "Ordersoperations.GetOrdersCountByIssuerHandler")
 	}
 
 	if o.IndexOrdersForMemberHandler == nil {
@@ -294,7 +294,7 @@ func (o *MilmoveOrdersAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/issuers/{issuer}/count"] = NewGetOrdersCount(o.context, o.GetOrdersCountHandler)
+	o.handlers["GET"]["/issuers/{issuer}/count"] = NewGetOrdersCountByIssuer(o.context, o.GetOrdersCountByIssuerHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
