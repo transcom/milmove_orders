@@ -98,6 +98,20 @@ func init() {
             "name": "issuer",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "string",
+            "format": "date-time",
+            "description": "Search date-time start",
+            "name": "startDateTime",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "date-time",
+            "description": "Search date-time end",
+            "name": "endDateTime",
+            "in": "query"
           }
         ],
         "responses": {
@@ -495,8 +509,22 @@ func init() {
           "description": "The number of orders in the DB by issuer.\n",
           "type": "integer"
         },
+        "endDateTime": {
+          "description": "Search date-time end",
+          "type": "string",
+          "format": "date-time",
+          "x-nullable": true,
+          "example": "2020-03-01T13:19:56-04:00"
+        },
         "issuer": {
           "$ref": "#/definitions/Issuer"
+        },
+        "startDateTime": {
+          "description": "Search date-time start",
+          "type": "string",
+          "format": "date-time",
+          "x-nullable": true,
+          "example": "2020-03-01T13:19:56-04:00"
         }
       }
     },
@@ -835,6 +863,20 @@ func init() {
             "name": "issuer",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "string",
+            "format": "date-time",
+            "description": "Search date-time start",
+            "name": "startDateTime",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "date-time",
+            "description": "Search date-time end",
+            "name": "endDateTime",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1233,8 +1275,22 @@ func init() {
           "type": "integer",
           "minimum": 0
         },
+        "endDateTime": {
+          "description": "Search date-time end",
+          "type": "string",
+          "format": "date-time",
+          "x-nullable": true,
+          "example": "2020-03-01T13:19:56-04:00"
+        },
         "issuer": {
           "$ref": "#/definitions/Issuer"
+        },
+        "startDateTime": {
+          "description": "Search date-time start",
+          "type": "string",
+          "format": "date-time",
+          "x-nullable": true,
+          "example": "2020-03-01T13:19:56-04:00"
         }
       }
     },

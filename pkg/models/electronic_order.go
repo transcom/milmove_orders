@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/gobuffalo/pop"
@@ -171,10 +172,20 @@ func FetchElectronicOrdersByEdipiAndIssuers(db *pop.Connection, edipi string, is
 }
 
 // FetchElectronicOrderCountByIssuer counts the number of orders by issuer
-func FetchElectronicOrderCountByIssuer(db *pop.Connection, issuer string) (int, error) {
-	count, err := db.Q().Where("issuer = $1", issuer).Count(ElectronicOrder{})
-	if err != nil {
-		return 0, err
+func FetchElectronicOrderCountByIssuer(db *pop.Connection, issuer string, startDateTime, endDateTime *string) (*int64, error) {
+
+	query := db.Q().Where("issuer = ?", issuer)
+	if startDateTime != nil {
+		query = query.Where("created_at >= ?::timestamp", *startDateTime)
 	}
-	return count, nil
+	if endDateTime != nil {
+		query = query.Where("created_at <= ?::timestamp", *endDateTime)
+	}
+	ct, errQuery := query.Count(ElectronicOrder{})
+
+	if errQuery != nil {
+		return nil, fmt.Errorf("Error fetching electronic orders count by issuer: %w", errQuery)
+	}
+	count := int64(ct)
+	return &count, nil
 }
