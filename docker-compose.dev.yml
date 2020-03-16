@@ -52,6 +52,7 @@ services:
       - DB_RETRY_INTERVAL=5s
       - DB_SSL_MODE=disable
       - DB_USER=postgres
+      - DEVLOCAL_AUTH=1
       - DEVLOCAL_CA=/home/circleci/milmove_orders/config/tls/devlocal-ca.pem
       - DOD_CA_PACKAGE=/home/circleci/milmove_orders/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
       - ENVIRONMENT=development
@@ -76,7 +77,7 @@ services:
       - NO_TLS_ENABLED=0
       - NO_TLS_PORT=7080
       - PGPASSWORD=mysecretpassword
-      - SERVE_ORDERS=true
+      - SERVE_ORDERS=1
       - TLS_ENABLED=1
       - TLS_PORT=6443
       - TZ=UTC

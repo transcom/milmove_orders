@@ -90,6 +90,6 @@ repos:
     hooks:
     - id: spelling-sort
       name: sort spelling doc
-      entry: /usr/bin/sort -o .spelling .spelling
+      entry: /usr/bin/sort -u -o .spelling .spelling
       language: script
       pass_filenames: false

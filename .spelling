@@ -18,6 +18,7 @@ U.S.
 aws
 aws-vault-wrappe
 creds
+devlocal
 e.g.
 emergency-evac
 golang
@@ -30,5 +31,6 @@ postgres
 prac-engineering
 prereqs
 repos
+sha256
 versioning
 yaml

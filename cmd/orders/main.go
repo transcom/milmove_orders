@@ -11,6 +11,15 @@ import (
 var gitBranch string
 var gitCommit string
 
+func stringSliceContains(stringSlice []string, value string) bool {
+	for _, x := range stringSlice {
+		if value == x {
+			return true
+		}
+	}
+	return false
+}
+
 func main() {
 
 	root := cobra.Command{

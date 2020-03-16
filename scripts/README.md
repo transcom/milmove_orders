@@ -117,6 +117,8 @@ These scripts are primarily for working with Mutual TLS certificates
 
 | Script Name | Description |
 | --- | --- |
+| `mutual-tls-extract-fingerprint` | Get SHA 256 fingerprint of the public certificate from a cert file |
+| `mutual-tls-extract-subject` | Get a sha256 hash of the certificate from a cert file|
 
 ### Amazon Console Scripts
 

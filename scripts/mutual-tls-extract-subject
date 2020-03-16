@@ -1,0 +1,10 @@
+#! /usr/bin/env bash
+
+set -eu -o pipefail
+
+#
+# Get the Subject of the public certificate from a *.cer file
+#
+
+# Certificate Subject
+openssl x509 -inform pem -noout -subject -nameopt RFC2253 -in "$1" | perl -ne 's/^subject= //; print'

@@ -30,10 +30,16 @@ using the certificates located in `config/tls/devlocal-mtls.{cer,key}` would be 
 $ orders-api-client get-orders --orders-uuid ${UUID}
 ```
 
-Using a CAC you might use additional options:
+For a full command in the devlocal environment you would use:
 
 ```sh
-$ orders-api-client --cac --insecure get-orders --orders-uuid ${UUID}
+$ orders-api-client --hostname orderslocal --port 7443 --insecure --certpath ./config/tls/devlocal-faux-all-orders.cer --keypath ./config/tls/devlocal-faux-all-orders.key get-orders --orders-uuid ${UUID}
+```
+
+Using a CAC can be done outside of the docker development environment. You would use these options:
+
+```sh
+$ orders-api-client --cac --hostname orderslocal --port 7443 --insecure get-orders --orders-uuid ${UUID}
 ```
 
 Additional options to configure the client can be listed in the command's help text.
