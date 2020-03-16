@@ -513,6 +513,7 @@ func init() {
           "description": "Search date-time end",
           "type": "string",
           "format": "date-time",
+          "x-nullable": true,
           "example": "2020-03-01T13:19:56-04:00"
         },
         "issuer": {
@@ -522,6 +523,7 @@ func init() {
           "description": "Search date-time start",
           "type": "string",
           "format": "date-time",
+          "x-nullable": true,
           "example": "2020-03-01T13:19:56-04:00"
         }
       }
@@ -1277,6 +1279,7 @@ func init() {
           "description": "Search date-time end",
           "type": "string",
           "format": "date-time",
+          "x-nullable": true,
           "example": "2020-03-01T13:19:56-04:00"
         },
         "issuer": {
@@ -1286,6 +1289,7 @@ func init() {
           "description": "Search date-time start",
           "type": "string",
           "format": "date-time",
+          "x-nullable": true,
           "example": "2020-03-01T13:19:56-04:00"
         }
       }

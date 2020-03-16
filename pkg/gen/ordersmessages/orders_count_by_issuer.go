@@ -24,7 +24,7 @@ type OrdersCountByIssuer struct {
 
 	// Search date-time end
 	// Format: date-time
-	EndDateTime strfmt.DateTime `json:"endDateTime,omitempty"`
+	EndDateTime *strfmt.DateTime `json:"endDateTime,omitempty"`
 
 	// issuer
 	// Required: true
@@ -32,7 +32,7 @@ type OrdersCountByIssuer struct {
 
 	// Search date-time start
 	// Format: date-time
-	StartDateTime strfmt.DateTime `json:"startDateTime,omitempty"`
+	StartDateTime *strfmt.DateTime `json:"startDateTime,omitempty"`
 }
 
 // Validate validates this orders count by issuer

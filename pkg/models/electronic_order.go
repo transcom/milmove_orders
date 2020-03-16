@@ -173,20 +173,40 @@ func FetchElectronicOrdersByEdipiAndIssuers(db *pop.Connection, edipi string, is
 
 // OrdersCountByIssuer continas the data about total number of orders and a start and end date-time for that count
 type OrdersCountByIssuer struct {
-	Count         int64     `db:"num"`
-	StartDateTime time.Time `db:"start"`
-	EndDateTime   time.Time `db:"end"`
+	Count int64 `db:"num"`
 }
 
 // FetchElectronicOrderCountByIssuer counts the number of orders by issuer
-func FetchElectronicOrderCountByIssuer(db *pop.Connection, issuer string) (*OrdersCountByIssuer, error) {
+func FetchElectronicOrderCountByIssuer(db *pop.Connection, issuer string, startDateTime, endDateTime *string) (*OrdersCountByIssuer, error) {
 	ordersCount := []OrdersCountByIssuer{}
-	sql := `SELECT count(*) as num, min(created_at) as start, max(created_at) as end FROM electronic_orders WHERE issuer = $1;`
+	var errQuery error
+	if startDateTime != nil && endDateTime != nil {
+		sql := `SELECT COUNT(*) AS num
+			FROM electronic_orders
+			WHERE issuer = $1
+			AND created_at BETWEEN $2 AND $3;`
+		errQuery = db.RawQuery(sql, issuer, *startDateTime, *endDateTime).All(&ordersCount)
+	} else if startDateTime != nil {
+		sql := `SELECT COUNT(*) AS num
+			FROM electronic_orders
+			WHERE issuer = $1
+			AND created_at >= $2;`
+		errQuery = db.RawQuery(sql, issuer, *startDateTime).All(&ordersCount)
+	} else if endDateTime != nil {
+		sql := `SELECT COUNT(*) AS num
+			FROM electronic_orders
+			WHERE issuer = $1
+			AND created_at <= $2;`
+		errQuery = db.RawQuery(sql, issuer, *endDateTime).All(&ordersCount)
+	} else {
+		sql := `SELECT COUNT(*) AS num
+			FROM electronic_orders
+			WHERE issuer = $1;`
+		errQuery = db.RawQuery(sql, issuer).All(&ordersCount)
+	}
 
-	err := db.RawQuery(sql, issuer).All(&ordersCount)
-
-	if err != nil {
-		return nil, fmt.Errorf("Error fetching electronic orders count by issuer: %w", err)
+	if errQuery != nil {
+		return nil, fmt.Errorf("Error fetching electronic orders count by issuer: %w", errQuery)
 	}
 
 	return &ordersCount[0], nil

@@ -168,11 +168,11 @@ func (suite *ModelSuite) TestFetchElectronicOrdersCountByIssuer() {
 	suite.NoError(err)
 	suite.NoVerrs(verrs)
 
-	countArmy, err := models.FetchElectronicOrderCountByIssuer(suite.DB(), string(models.IssuerArmy))
+	countArmy, err := models.FetchElectronicOrderCountByIssuer(suite.DB(), string(models.IssuerArmy), nil, nil)
 	suite.NoError(err)
-	suite.Equal(countArmy.Count, 1)
+	suite.Equal(int64(1), countArmy.Count)
 
-	countAirForce, err := models.FetchElectronicOrderCountByIssuer(suite.DB(), string(models.IssuerAirForce))
+	countAirForce, err := models.FetchElectronicOrderCountByIssuer(suite.DB(), string(models.IssuerAirForce), nil, nil)
 	suite.NoError(err)
-	suite.Equal(countAirForce.Count, 1)
+	suite.Equal(int64(1), countAirForce.Count)
 }
