@@ -1,5 +1,8 @@
 # This is the migrations manifest.
 # If a migration is not recorded here, then it will error.
+20200210000000_rds_iam_role.up.sql
+20200210000001_master_role.up.sql
+20200210000002_ecs_user_for_rds.up.sql
 20200211000001_create_client_cert_table.up.sql
 20200211000002_create_electronic_orders.up.sql
 20200211000003_create_electronic_orders_revisions.up.sql
