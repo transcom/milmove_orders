@@ -34,7 +34,18 @@ dev_up: ## Start development environment
 
 .PHONY: dev
 dev: ## Attach to the development environment if running
-	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.dev.yml exec dev /bin/bash
+	@aws-vault exec "${AWS_PROFILE}" -- \
+	docker-compose -f docker-compose.dev.yml exec \
+		-e AWS_ACCESS_KEY_ID \
+		-e AWS_ACCOUNT_ID \
+		-e AWS_DEFAULT_REGION \
+		-e AWS_REGION \
+		-e AWS_SDK_LOAD_CONFIG \
+		-e AWS_SECRET_ACCESS_KEY \
+		-e AWS_SECURITY_TOKEN \
+		-e AWS_SESSION_EXPIRATION \
+		-e AWS_SESSION_TOKEN \
+		dev /bin/bash
 
 .PHONY: dev_logs
 dev_logs: ## Follow the logs from the server

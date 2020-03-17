@@ -38,7 +38,9 @@ services:
       - AWS_SECURITY_TOKEN
       - AWS_SESSION_EXPIRATION
       - AWS_SESSION_TOKEN
+      - CHAMBER_KMS_KEY_ALIAS=alias/aws/ssm
       - CHAMBER_RETRIES=20
+      - CHAMBER_USE_PATHS=1
       - DB_DEBUG=1
       - DB_ENV=development
       - DB_HOST=database

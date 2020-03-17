@@ -28,7 +28,7 @@ const (
 
 func initGetOrdersCountFlags(flag *pflag.FlagSet) {
 	flag.String(IssuerFlag, "navy", "The Issuer of the orders")
-	flag.Duration(RelativeTimeFlag, time.Hour*24, "The relative time to search backwards from when the command is invoked, set to '-1m' to disable")
+	flag.Duration(RelativeTimeFlag, time.Hour*24, "The relative time to search backwards from when the command is invoked in UTC, set to '-1m' to disable")
 	flag.String(StartTimestampFlag, "", "The Start time to search from, overrides relative-time search")
 	flag.String(EndTimestampFlag, "", "The End time to search to, overrides relative-time search")
 
@@ -118,7 +118,7 @@ func getOrdersCount(cmd *cobra.Command, args []string) error {
 		params.SetEndDateTime((*strfmt.DateTime)(&endTime))
 	}
 	if startTimestamp == "" && endTimestamp == "" {
-		now := time.Now()
+		now := time.Now().UTC()
 		relativeTime := v.GetDuration(RelativeTimeFlag)
 		if relativeTime > time.Hour*0 {
 			startTime := now.Add(relativeTime * -1)
