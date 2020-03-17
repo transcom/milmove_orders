@@ -58,7 +58,7 @@ dev_reset_server: ## Reset running server
 .PHONY: clean
 clean: ## Clean all generated files
 	rm -rf ./bin
-	rm -rf ./tmp/secure_migrations
+	rm -rf ./tmp
 	rm -rf ./log
 
 #
