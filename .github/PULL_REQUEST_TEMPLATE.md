@@ -20,10 +20,10 @@ echo "Code goes here"
 * [ ] The requirements listed in
  [Querying the Database Safely](https://github.com/transcom/mymove/tree/master/docs/backend.md#querying-the-database-safely)
  have been satisfied.
-* Any new migrations/schema changes:
+* [ ] Any new migrations/schema changes:
   * [ ] Follow our guidelines for zero-downtime deploys (see [Zero-Downtime Deploys](https://github.com/transcom/mymove/tree/master/docs/database.md#zero-downtime-migrations))
   * [ ] Have been communicated to #prac-engineering
-  * [ ] Secure migrations have been tested using `scripts/run-prod-migrations`
+  * [ ] Secure migrations have been tested locally with commands like `make run_experimental_migrations`
 * [ ] Tested in the Experimental environment (for changes to containers, app startup, or connection to data stores)
 * [ ] Request review from a member of a different team.
 * [ ] Have the Jira acceptance criteria been met for this change?
