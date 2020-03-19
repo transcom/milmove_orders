@@ -1,0 +1,31 @@
+###########
+# BUILDER #
+###########
+
+FROM milmove/circleci-docker:milmove-app-e955f6e90454414cf3848e17786c41f614ef50db as builder
+
+ENV CIRCLECI=true
+
+COPY --chown=circleci:circleci . /home/circleci/project
+WORKDIR /home/circleci/project
+
+RUN make clean
+RUN rm -f bin/orders-api-client && make bin/orders-api-client
+
+#########
+# FINAL #
+#########
+
+FROM alpine:3.11.3
+
+COPY --from=builder --chown=root:root /home/circleci/project/bin/orders-api-client /bin/orders-api-client
+
+# Install data needed for tests
+COPY config/tls/ /bin/config/tls/
+COPY testdata/ /bin/testdata/
+
+# Install tools needed in container
+RUN apk update
+RUN apk add postgresql-client bash --no-cache
+
+WORKDIR /bin

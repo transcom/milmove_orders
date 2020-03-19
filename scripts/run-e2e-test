@@ -1,0 +1,124 @@
+#! /usr/bin/env bash
+
+set -eux -o pipefail
+
+# Setting REACT_APP_NODE_ENV to develompent enables the "Local Sign In" button
+export REACT_APP_NODE_ENV=development
+
+# Set Defaults
+NETWORK="milmove_orders_default" # Docker network
+
+# When running locally enable TTY
+DOCKER_RUN="docker run -t"
+if [ -n "${CIRCLECI+x}" ]; then
+  echo "RUNNING IN CIRCLECI"
+  DOCKER_RUN="docker run"
+fi
+
+# Check that the docker process is running first
+docker system info >> /dev/null
+
+if [[ -n "${CIRCLECI+x}" ]]; then
+  # CI/CD allows us to use pre-built images using the branch name
+  scripts/update-docker-compose
+
+  # Let's clean things up before starting
+  # This may show an error locally but can be safely ignored, its only for CircleCI
+  docker-compose -f docker-compose.branch.yml down --rmi all || true
+
+  # Docker Compose Setup
+  aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+
+  # If you don't pull and CircleCI has cached previous images then you won't see any changes from AWS ECR
+  docker-compose -f docker-compose.branch.yml pull
+
+  # Bring these containers up but don't start them so they can be manipulated first
+  docker-compose -f docker-compose.branch.yml up --no-start
+
+  # Can't mount folders in CircleCI so copy this data in
+  # https://circleci.com/docs/2.0/building-docker-images/#mounting-folders
+  docker cp ./migrations/orders/secure milmove_orders_milmove_migrate_1:/migrate/
+
+  # Start everything up
+  docker-compose -f docker-compose.branch.yml up -d --no-recreate --remove-orphans
+
+  # Build a small e2e dockerfile
+  docker build -f Dockerfile.e2e --tag e2e:latest .
+
+  # Following the logs should block any more actions until migrations are completed and the container exits
+  docker-compose -f docker-compose.branch.yml logs -f milmove_migrate
+else
+  # Locally development requires that we build the container
+
+  # Let's clean things up before starting
+  docker-compose -f docker-compose.local.yml down --remove-orphans || true
+
+  # Build images and start everything up
+  docker-compose -f docker-compose.local.yml up --remove-orphans -d --build
+
+  # Build a small e2e dockerfile
+  docker build -f Dockerfile.e2e_local --tag e2e:latest .
+
+  # Following the logs should block any more actions until migrations are completed and the container exits
+  docker-compose -f docker-compose.local.yml logs -f milmove_migrate
+fi
+
+# Need to wait not just for DB but also migrations to finish
+while true; do
+  MIGRATE_EXIT=$(docker ps --filter="name=milmove_orders_milmove_migrate_1" --filter="status=exited" -q)
+  if [[ -n "${MIGRATE_EXIT}" ]]; then
+    break
+  else
+    echo
+    echo "Waiting 5 seconds for migrations to complete"
+    sleep 5
+  fi
+done
+
+MIGRATE_EXIT_CODE=$(docker inspect --format='{{.State.ExitCode}}' milmove_orders_milmove_migrate_1)
+if [[ "${MIGRATE_EXIT_CODE}" != "0" ]]; then
+  echo
+  echo "Migration exited with exit code ${MIGRATE_EXIT_CODE}"
+  exit 1
+fi
+
+#
+# INTEGRATION TESTS START
+#
+
+function orders_api_client () {
+  # Cannot mount directories in CircleCI so certificates and data are built into the container
+  $DOCKER_RUN \
+    --link="milmove" \
+    --net "${NETWORK}" \
+    --rm \
+    --entrypoint orders-api-client \
+    e2e:latest \
+    --certpath ./config/tls/devlocal-faux-navy-orders.cer \
+    --keypath ./config/tls/devlocal-faux-navy-orders.key \
+    --insecure \
+    --hostname milmove \
+    --port 7443 \
+    "$@"
+}
+# Below are Common API Calls in order that they should be used to test out the orders-api-client
+
+# Load original orders
+orders_api_client post-revisions --issuer navy --csv-file ./testdata/nom_demo_20190404.csv
+
+# Check that the orders have been uploaded
+orders_api_client get-orders-count --issuer navy
+
+# Load orders revisions
+orders_api_client post-revisions --issuer navy --csv-file ./testdata/nom_demo_20190404_rev_update.csv
+
+#
+# INTEGRATION TESTS END
+#
+
+# Stop the app container to release the DB connection
+if [[ -n "${CIRCLECI+x}" ]]; then
+  docker-compose -f docker-compose.branch.yml down --remove-orphans || true
+else
+  docker-compose -f docker-compose.local.yml down --remove-orphans || true
+fi

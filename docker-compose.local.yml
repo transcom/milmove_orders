@@ -69,13 +69,16 @@ services:
       - DB_NAME=dev_db
       - DB_PASSWORD=mysecretpassword
       - DB_PORT=5432
+      - DB_REGION=us-west-2
       - DB_RETRY_INTERVAL=5s
       - DB_SSL_MODE=disable
       - DB_USER=postgres
+      - DEVLOCAL_AUTH=1
       - DEVLOCAL_CA=/config/tls/devlocal-ca.pem
       - DOD_CA_PACKAGE=/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
       - ENVIRONMENT=test
-      - HTTP_ORDERS_SERVER_NAME=orderslocal
+      - HTTP_ORDERS_SERVER_NAME=milmove
+      - INTERFACE=0.0.0.0
       - IWS_RBS_ENABLED=0
       - IWS_RBS_HOST=pkict.dmdc.osd.mil
       - MOVE_MIL_DOD_CA_CERT
@@ -86,8 +89,8 @@ services:
       - NO_TLS_ENABLED=0
       - NO_TLS_PORT=7080
       - PGPASSWORD=mysecretpassword
-      - SERVE_ORDERS=true
-      - TLS_ENABLED=0
+      - SERVE_ORDERS=1
+      - TLS_ENABLED=1
       - TLS_PORT=6443
       - TZ=UTC
     volumes:

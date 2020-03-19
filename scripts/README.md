@@ -75,6 +75,7 @@ This subset of development scripts is used for testing
 
 | Script Name | Description |
 | --- | --- |
+| `run-e2e-test` | Runs integration tests with orders-api-client |
 | `run-server-test` | Run golang server tests |
 
 ### Secure Migrations

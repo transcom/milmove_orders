@@ -243,6 +243,19 @@ commands:
             MIGRATION_MANIFEST: '/home/circleci/milmove_orders/migrations/<< parameters.application >>/migrations_manifest.txt'
             MIGRATION_PATH: 'file:///home/circleci/milmove_orders/migrations/<< parameters.application >>/schema;file:///home/circleci/milmove_orders/migrations/<< parameters.application >>/secure'
             SERVE_API_INTERNAL: true
+  e2e_tests:
+    steps:
+      - run:
+          name: make e2e_test
+          command: |
+            echo 'export MOVE_MIL_DOD_CA_CERT=$(cat /home/circleci/milmove_orders/config/tls/devlocal-ca.pem)' >> $BASH_ENV
+            echo 'export MOVE_MIL_DOD_TLS_CERT=$(cat /home/circleci/milmove_orders/config/tls/devlocal-mtls.cer)' >> $BASH_ENV
+            echo 'export MOVE_MIL_DOD_TLS_KEY=$(cat /home/circleci/milmove_orders/config/tls/devlocal-mtls.key)' >> $BASH_ENV
+            source $BASH_ENV
+            make e2e_test
+          environment:
+            # Env vars needed for the webserver to run inside docker
+            DOD_CA_PACKAGE: /home/circleci/transcom/mymove/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
 
 jobs:
   # `pre_deps_golang` is used for caching Go module sources
@@ -349,6 +362,20 @@ jobs:
             MIGRATION_PATH: 'file:///home/circleci/milmove_orders/migrations/orders/schema;file:///home/circleci/milmove_orders/migrations/orders/secure'
             MUTUAL_TLS_ENABLED: true
             PWD: /home/circleci/milmove_orders
+      - announce_failure
+
+  # `integration_tests` runs integration tests using Cypress.  https://www.cypress.io/
+  integration_tests:
+    executor: milmove_orders_medium
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - restore_cache:
+          keys:
+            - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+      - run: rm -f bin/orders-api-client && make bin/orders-api-client
+      - e2e_tests
       - announce_failure
 
   # `server_test` runs the server side Go tests
@@ -495,6 +522,18 @@ workflows:
       - acceptance_tests_experimental:
           requires:
             - pre_deps_golang
+
+      - integration_tests:
+          requires:
+            - pre_deps_golang
+            - check_generated_code
+            - build_orders
+            - build_migrations
+            - acceptance_tests_local
+          # if testing on experimental, you can disable these tests by using the commented block below.
+          filters:
+            branches:
+              ignore: placeholder_branch_name
 
       - server_test:
           requires:
