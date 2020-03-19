@@ -20,6 +20,7 @@ aws-vault-wrappe
 creds
 devlocal
 e.g.
+e2e
 emergency-evac
 golang
 ipcot

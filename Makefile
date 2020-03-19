@@ -168,7 +168,7 @@ server_run:
 # Note: The INTERFACE envar is set to configure the gin build, orders_gin, local IP4 space with default port GIN_PORT.
 server_run_default: check_log_dir bin/gin server_generate db_dev_run
 	DEBUG_LOGGING=true \
-	$(AWS_VAULT) ./bin/gin \
+	./bin/gin \
 		--build ./cmd/orders \
 		--bin /bin/orders_gin \
 		--laddr 0.0.0.0 --port "$(GIN_PORT)" \
@@ -397,4 +397,16 @@ docker_compose_local_down: ## Destroy docker-compose containers for current loca
 
 #
 # ----- END DOCKER COMPOSE TARGETS -----
+#
+
+#
+# ----- START E2E TARGETS -----
+#
+
+.PHONY: e2e_test
+e2e_test: ## Run e2e (end-to-end) integration tests
+	./scripts/run-e2e-test
+
+#
+# ----- END E2E TARGETS -----
 #
