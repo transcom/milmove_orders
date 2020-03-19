@@ -373,7 +373,7 @@ jobs:
           docker_layer_caching: false
       - restore_cache:
           keys:
-            - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+            - go-mod-sources-v2-{{ checksum "go.sum" }}
       - run: rm -f bin/orders-api-client && make bin/orders-api-client
       - e2e_tests
       - announce_failure
@@ -464,7 +464,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-mod-sources-v2-{{ checksum "go.sum" }}-{{ checksum "scripts/check-go-version" }}
+            - go-mod-sources-v2-{{ checksum "go.sum" }}
       - run:
           name: Run acceptance tests
           command: make acceptance_test
