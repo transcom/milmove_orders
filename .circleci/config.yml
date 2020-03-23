@@ -296,6 +296,16 @@ jobs:
             - '/go/pkg/mod'
       - announce_failure
 
+  # `anti_virus` uses virus detection software to scan the source code
+  anti_virus:
+    executor: milmove_orders_medium
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run: make anti_virus
+      - announce_failure
+
   # `pre_test` runs pre-commit against all files.
   pre_test:
     executor: milmove_orders_medium
@@ -511,6 +521,11 @@ workflows:
           requires:
             - pre_deps_golang
 
+      - anti_virus:
+          filters:
+            branches:
+              only: master
+
       - pre_test:
           requires:
             - pre_deps_golang
@@ -545,15 +560,18 @@ workflows:
 
       - build_orders:
           requires:
+            - anti_virus
             - pre_deps_golang
             - acceptance_tests_local # don't bother building and pushing the application if it won't even start properly
 
       - build_tools:
           requires:
+            - anti_virus
             - pre_deps_golang
 
       - build_migrations:
           requires:
+            - anti_virus
             - pre_deps_golang
 
       - deploy_experimental_migrations:

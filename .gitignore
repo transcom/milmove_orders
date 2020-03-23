@@ -34,3 +34,6 @@ schema.sql
 
 # Certs
 *.srl
+
+# Scripts
+scripts/anti-virus
