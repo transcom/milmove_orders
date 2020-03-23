@@ -16,9 +16,7 @@ services:
       - POSTGRES_DB=dev_db
 
   dev:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
+    image: milmove/circleci-docker:milmove-orders
     entrypoint: make server_run
     links:
       - database
@@ -78,6 +76,7 @@ services:
       - MUTUAL_TLS_PORT=7443
       - NO_TLS_ENABLED=0
       - NO_TLS_PORT=7080
+      - PATH=/home/circleci/.local/bin:/home/circleci/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/circleci/milmove_orders/scripts
       - PGPASSWORD=mysecretpassword
       - SERVE_ORDERS=1
       - TLS_ENABLED=1
@@ -86,5 +85,7 @@ services:
     extra_hosts:
       - "orderslocal:127.0.0.1"
     volumes:
-      - ./:/home/circleci/milmove_orders
+      - ./:/home/circleci/milmove_orders:rw
+      - ${HOME}/.ssh/:/home/circleci/.ssh/:ro
+      - ${HOME}/.gitconfig:/home/circleci/.gitconfig:ro
     working_dir: /home/circleci/milmove_orders

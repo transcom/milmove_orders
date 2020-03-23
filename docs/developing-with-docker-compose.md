@@ -22,6 +22,8 @@ To enter the development environment with a Bash prompt run:
 make dev
 ```
 
+**NOTE:** You do not need to run `make dev_up` but its preferred that you do.
+
 To reset your environment run
 
 ```sh
