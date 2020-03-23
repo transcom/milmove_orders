@@ -410,3 +410,19 @@ e2e_test: ## Run e2e (end-to-end) integration tests
 #
 # ----- END E2E TARGETS -----
 #
+
+#
+# ----- START ANTI VIRUS TARGETS -----
+#
+
+.PHONY: anti_virus
+anti_virus: ## Scan repo with anti-virus service
+	test -f scripts/anti-virus || curl -sSL https://raw.githubusercontent.com/transcom/mymove/master/scripts/anti-virus -o scripts/anti-virus
+	chmod +x ./scripts/anti-virus
+	./scripts/anti-virus
+
+#
+# ----- END ANTI VIRUS TARGETS -----
+#
+
+default: help

@@ -134,3 +134,4 @@ These scripts are used to do vulnerability scanning on our code
 
 | Script Name | Description |
 | --- | --- |
+| `anti-virus` | Scan the source code for viruses |
