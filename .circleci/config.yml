@@ -528,7 +528,7 @@ workflows:
       - anti_virus:
           filters:
             branches:
-              only: master
+              only: cg_anti_virus_source_code
 
       - pre_test:
           requires:
