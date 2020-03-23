@@ -34,6 +34,7 @@ dev_up: ## Start development environment
 
 .PHONY: dev
 dev: ## Attach to the development environment if running
+	@docker inspect --format='{{.State.ExitCode}}' milmove_orders_dev_1 > /dev/null 2>&1 || make dev_up
 	@aws-vault exec "${AWS_PROFILE}" -- \
 	docker-compose -f docker-compose.dev.yml exec \
 		-e AWS_ACCESS_KEY_ID \
