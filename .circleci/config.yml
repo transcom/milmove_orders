@@ -303,7 +303,11 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: false
-      - run: make anti_virus
+      - run:
+          name: make anti_virus
+          command: make anti_virus
+          environment:
+            AV_DIR: /home/circleci/milmove_orders
       - announce_failure
 
   # `pre_test` runs pre-commit against all files.
