@@ -552,7 +552,7 @@ workflows:
           # if testing on experimental, you can disable these tests by using the commented block below.
           filters:
             branches:
-              ignore: placeholder_branch_name
+              ignore: cg_simplify_docker_dev
 
       - server_test:
           requires:
@@ -560,7 +560,7 @@ workflows:
           # if testing on experimental, you can disable these tests by using the commented block below.
           filters:
             branches:
-              ignore: placeholder_branch_name
+              ignore: cg_simplify_docker_dev
 
       - build_orders:
           requires:
@@ -589,14 +589,14 @@ workflows:
             - build_migrations
           filters:
             branches:
-              only: placeholder_branch_name
+              only: cg_simplify_docker_dev
 
       - deploy_experimental_app:
           requires:
             - deploy_experimental_migrations
           filters:
             branches:
-              only: placeholder_branch_name
+              only: cg_simplify_docker_dev
 
 experimental:
   notify:
