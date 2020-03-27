@@ -6,7 +6,7 @@ version: '3.3'
 
 services:
   database:
-    image: postgres:10.10
+    image: postgres:10.12
     restart: always
     ports:
       - '7432:5432'

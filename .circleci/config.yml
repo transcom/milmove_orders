@@ -17,7 +17,7 @@ orbs:
 # References for variables shared across the file
 references:
   circleci-docker: &circleci-docker milmove/circleci-docker:milmove-orders-de8333d340c6cc5bc7554c913a955aacfa0c4d2b
-  postgres: &postgres postgres:10.10
+  postgres: &postgres postgres:10.12
 
 executors:
   # `milmove_orders_small` and `milmove_orders_medium` use the `milmove/circleci-docker` docker image with a checkout of the milmove_orders code
