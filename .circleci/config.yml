@@ -539,7 +539,7 @@ workflows:
       - anti_virus:
           filters:
             branches:
-              only: cg_simplify_antivirus
+              only: master
 
       - pre_test:
           requires:
