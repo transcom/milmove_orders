@@ -2,8 +2,6 @@ DB_NAME_DEV = dev_db
 DB_NAME_DEPLOYED_MIGRATIONS = deployed_migrations
 DB_NAME_TEST = test_db
 # The version of the postgres container should match production as closely as possible.
-DB_DOCKER_CONTAINER_IMAGE = postgres:10.10
-DB_PORT_DEV=5432
 DB_PORT_TEST=5432
 export PGPASSWORD=mysecretpassword
 
