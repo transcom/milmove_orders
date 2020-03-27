@@ -350,8 +350,8 @@ jobs:
           destination: test-results
       - announce_failure
 
-  # `acceptance_tests_local` runs acceptance tests for the webserver against a local environment.
-  acceptance_tests_local:
+  # `acceptance_tests` runs acceptance tests for the webserver against the local, experimental, and staging environments.
+  acceptance_tests:
     executor: milmove_orders_medium
     steps:
       - checkout
@@ -359,7 +359,7 @@ jobs:
           keys:
             - go-mod-sources-v2-{{ checksum "go.sum" }}
       - run:
-          name: Run acceptance tests
+          name: Run Local acceptance tests
           command: |
             echo 'export MOVE_MIL_DOD_CA_CERT=$(cat /home/circleci/milmove_orders/config/tls/devlocal-ca.pem)' >> $BASH_ENV
             echo 'export MOVE_MIL_DOD_TLS_CERT=$(cat /home/circleci/milmove_orders/config/tls/devlocal-mtls.cer)' >> $BASH_ENV
@@ -367,6 +367,8 @@ jobs:
             source $BASH_ENV
             make acceptance_test
           environment:
+            CHAMBER_RETRIES: 20
+            DB_REGION: us-west-2
             DB_RETRY_INTERVAL: 5s
             DEVLOCAL_CA: /home/circleci/milmove_orders/config/tls/devlocal-ca.pem
             DOD_CA_PACKAGE: /home/circleci/milmove_orders/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
@@ -376,6 +378,22 @@ jobs:
             MIGRATION_PATH: 'file:///home/circleci/milmove_orders/migrations/orders/schema;file:///home/circleci/milmove_orders/migrations/orders/secure'
             MUTUAL_TLS_ENABLED: true
             PWD: /home/circleci/milmove_orders
+      - run:
+          name: Run Experimental acceptance tests
+          command: make acceptance_test
+          environment:
+            CHAMBER_RETRIES: 20
+            DB_REGION: us-west-2
+            DB_RETRY_INTERVAL: 5s
+            DEVLOCAL_CA: /home/circleci/milmove_orders/config/tls/devlocal-ca.pem
+            DOD_CA_PACKAGE: /home/circleci/milmove_orders/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
+            ENV: test
+            ENVIRONMENT: experimental
+            MUTUAL_TLS_ENABLED: true
+            PWD: /home/circleci/milmove_orders
+            TEST_ACC_ENV: experimental
+      - run: echo "Staging acceptance tests are not yet implemented in CircleCI"
+      - run: echo "Prod acceptance tests are prohibited in CircleCI"
       - announce_failure
 
   # `integration_tests` runs integration tests using Cypress.  https://www.cypress.io/
@@ -470,31 +488,6 @@ jobs:
           repo: orders-migrations
       - announce_failure
 
-
-  # `acceptance_tests_experimental` runs acceptance tests for the webserver against the experimental environment.
-  acceptance_tests_experimental:
-    executor: milmove_orders_medium
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - go-mod-sources-v2-{{ checksum "go.sum" }}
-      - run:
-          name: Run acceptance tests
-          command: make acceptance_test
-          environment:
-            CHAMBER_RETRIES: 20
-            DB_REGION: us-west-2
-            DB_RETRY_INTERVAL: 5s
-            DEVLOCAL_CA: /home/circleci/milmove_orders/config/tls/devlocal-ca.pem
-            DOD_CA_PACKAGE: /home/circleci/milmove_orders/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
-            ENV: test
-            ENVIRONMENT: experimental
-            MUTUAL_TLS_ENABLED: true
-            PWD: /home/circleci/milmove_orders
-            TEST_ACC_ENV: experimental
-      - announce_failure
-
   # `deploy_experimental_migrations` deploys migrations to the experimental environment
   deploy_experimental_migrations:
     executor: milmove_orders_small
@@ -534,11 +527,7 @@ workflows:
           requires:
             - pre_deps_golang
 
-      - acceptance_tests_local:
-          requires:
-            - pre_deps_golang
-
-      - acceptance_tests_experimental:
+      - acceptance_tests:
           requires:
             - pre_deps_golang
 
@@ -548,7 +537,7 @@ workflows:
             - check_generated_code
             - build_orders
             - build_migrations
-            - acceptance_tests_local
+            - acceptance_tests
           # if testing on experimental, you can disable these tests by using the commented block below.
           filters:
             branches:
@@ -566,7 +555,7 @@ workflows:
           requires:
             - anti_virus
             - pre_deps_golang
-            - acceptance_tests_local # don't bother building and pushing the application if it won't even start properly
+            - acceptance_tests # don't bother building and pushing the application if it won't even start properly
 
       - build_tools:
           requires:
@@ -582,8 +571,7 @@ workflows:
           requires:
             - pre_test
             - server_test
-            - acceptance_tests_local
-            - acceptance_tests_experimental
+            - acceptance_tests
             - build_orders
             - build_tools
             - build_migrations
