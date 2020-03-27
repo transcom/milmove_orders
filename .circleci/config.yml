@@ -541,7 +541,7 @@ workflows:
           # if testing on experimental, you can disable these tests by using the commented block below.
           filters:
             branches:
-              ignore: placeholder_branch_name
+              ignore: cg_postgres_11.6
 
       - server_test:
           requires:
@@ -549,7 +549,7 @@ workflows:
           # if testing on experimental, you can disable these tests by using the commented block below.
           filters:
             branches:
-              ignore: placeholder_branch_name
+              ignore: cg_postgres_11.6
 
       - build_orders:
           requires:
@@ -577,14 +577,14 @@ workflows:
             - build_migrations
           filters:
             branches:
-              only: placeholder_branch_name
+              only: cg_postgres_11.6
 
       - deploy_experimental_app:
           requires:
             - deploy_experimental_migrations
           filters:
             branches:
-              only: placeholder_branch_name
+              only: cg_postgres_11.6
 
 experimental:
   notify:
