@@ -3,7 +3,7 @@ module github.com/transcom/milmove_orders
 go 1.14
 
 require (
-	github.com/aws/aws-sdk-go v1.29.34
+	github.com/aws/aws-sdk-go v1.30.0
 	github.com/codegangsta/gin v0.0.0-20171026143024-cafe2ce98974
 	github.com/go-openapi/errors v0.19.4
 	github.com/go-openapi/loads v0.19.5
@@ -21,7 +21,6 @@ require (
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/imdario/mergo v0.3.9
 	github.com/jessevdk/go-flags v1.4.0
-	github.com/jmespath/go-jmespath v0.3.0 // indirect
 	github.com/jstemmer/go-junit-report v0.9.1
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lib/pq v1.3.0
