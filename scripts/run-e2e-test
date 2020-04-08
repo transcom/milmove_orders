@@ -89,7 +89,7 @@ fi
 function orders_api_client () {
   # Cannot mount directories in CircleCI so certificates and data are built into the container
   $DOCKER_RUN \
-    --link="milmove" \
+    --link="milmove:orderslocal" \
     --net "${NETWORK}" \
     --rm \
     --entrypoint orders-api-client \
@@ -97,7 +97,7 @@ function orders_api_client () {
     --certpath ./config/tls/devlocal-faux-navy-orders.cer \
     --keypath ./config/tls/devlocal-faux-navy-orders.key \
     --insecure \
-    --hostname milmove \
+    --hostname orderslocal \
     --port 7443 \
     "$@"
 }
