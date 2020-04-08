@@ -384,7 +384,7 @@ docker_compose_branch_down: ## Destroy docker-compose containers for current bra
 	docker-compose -f docker-compose.branch.yml down
 	# Instead of using `--rmi all` which might destroy postgres we just remove the AWS containers
 	docker rmi $(shell docker images --filter=reference='*amazonaws*/*:*' --format "{{.ID}}")
-	git checkout docker-compose.yml
+	git checkout docker-compose.branch.yml
 
 .PHONY: docker_compose_local_up
 docker_compose_local_up: ## Bring up docker-compose containers for current local with AWS ECR images
