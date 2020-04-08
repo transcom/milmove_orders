@@ -73,7 +73,7 @@ services:
       - DEVLOCAL_CA=/config/tls/devlocal-ca.pem
       - DOD_CA_PACKAGE=/config/tls/Certificates_PKCS7_v5.6_DoD.der.p7b
       - ENVIRONMENT=test
-      - HTTP_ORDERS_SERVER_NAME=milmove
+      - HTTP_ORDERS_SERVER_NAME=orderslocal
       - INTERFACE=0.0.0.0
       - IWS_RBS_ENABLED=0
       - IWS_RBS_HOST=pkict.dmdc.osd.mil
@@ -89,5 +89,7 @@ services:
       - TLS_ENABLED=1
       - TLS_PORT=6443
       - TZ=UTC
+    extra_hosts:
+      - "orderslocal:127.0.0.1"
     volumes:
       - ./tmp:/tmp
