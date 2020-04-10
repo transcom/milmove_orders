@@ -34,5 +34,8 @@ if ! chamber_cmd list orders-devlocal --retries=1 > /dev/null ; then
   log_error "Unable to access orders-devlocal variables with chamber."
   log_error "Login to chamber with 'chamber list orders-devlocal'."
 else
-  eval "$(chamber_cmd env orders-devlocal --retries=1)"
+  # Without the newline character the last variable will include the carriage return character
+  # which in turn makes the output of the last variable erase. I believe this is an interaction
+  # between eval and docker and not with chamber itself.
+  eval "$(chamber_cmd env orders-devlocal --retries=1)\n"
 fi
