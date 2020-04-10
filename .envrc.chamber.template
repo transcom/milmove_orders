@@ -4,14 +4,35 @@
 # Load Secrets from Chamber #
 #############################
 
+set -eu -o pipefail
+
+# Run chamber inside docker container and pass through AWS creds
+function chamber_cmd () {
+  aws-vault exec "${AWS_PROFILE}" -- \
+    docker run \
+      -it \
+      --rm \
+      --entrypoint chamber \
+      -e AWS_ACCESS_KEY_ID \
+      -e AWS_ACCOUNT_ID \
+      -e AWS_REGION \
+      -e AWS_SDK_LOAD_CONFIG \
+      -e AWS_SECRET_ACCESS_KEY \
+      -e AWS_SECURITY_TOKEN \
+      -e AWS_SESSION_EXPIRATION \
+      -e AWS_SESSION_TOKEN \
+      milmove/circleci-docker:milmove-orders \
+      "$@"
+}
+
 # Secrets should be stored in the corresponding Google Doc listed in the .envrc file.
 # Secrets should also be added to chamber with `chamber write orders-devlocal lower_case_version secret_key`
 
 # This line grabs any available secrets in orders-devlocal and adds them to the environment.
 # Lines that begin with `require ...` should still run to verify the secret is set.
-if ! aws-vault exec "${AWS_PROFILE}" -- chamber list orders-devlocal --retries=1 > /dev/null ; then
+if ! chamber_cmd list orders-devlocal --retries=1 > /dev/null ; then
   log_error "Unable to access orders-devlocal variables with chamber."
   log_error "Login to chamber with 'chamber list orders-devlocal'."
 else
-  eval "$(aws-vault exec "${AWS_PROFILE}" -- chamber env orders-devlocal --retries=1)"
+  eval "$(chamber_cmd env orders-devlocal --retries=1)"
 fi
