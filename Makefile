@@ -28,12 +28,12 @@ help: ## Print the help documentation
 .PHONY: dev_up
 dev_up: ## Start development environment
 	docker-compose -f docker-compose.dev.yml build --pull
-	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.dev.yml up -d
+	aws-vault exec "$(AWS_PROFILE)" -- docker-compose -f docker-compose.dev.yml up -d
 
 .PHONY: dev
 dev: ## Attach to the development environment if running
 	@docker inspect --format='{{.State.ExitCode}}' milmove_orders_dev_1 > /dev/null 2>&1 || make dev_up
-	@aws-vault exec "${AWS_PROFILE}" -- \
+	@aws-vault exec "$(AWS_PROFILE)" -- \
 	docker-compose -f docker-compose.dev.yml exec \
 		-e AWS_ACCESS_KEY_ID \
 		-e AWS_ACCOUNT_ID \
@@ -63,7 +63,7 @@ dev_reset_db: ## Reset running db
 
 .PHONY: dev_reset_server
 dev_reset_server: ## Reset running server
-	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.dev.yml restart dev
+	aws-vault exec "$(AWS_PROFILE)" -- docker-compose -f docker-compose.dev.yml restart dev
 
 .PHONY: clean
 clean: ## Clean all generated files
@@ -246,14 +246,14 @@ server_test_coverage: db_test_reset db_test_migrate server_test_coverage_generat
 
 .PHONY: db_dev_destroy
 db_dev_destroy: ## Destroy Dev DB
-	@echo "Destroying the ${DB_NAME_DEV} database ..."
-	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}" -c "DROP DATABASE IF EXISTS ${DB_NAME_DEV};" || true
+	@echo "Destroying the $(DB_NAME_DEV) database ..."
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"$(DB_PASSWORD)"@$(DB_HOST):"$(DB_PORT)" -c "DROP DATABASE IF EXISTS $(DB_NAME_DEV);" || true
 
 .PHONY: db_dev_create
 db_dev_create: ## Create Dev DB
-	@echo "Create the ${DB_NAME_DEV} database..."
+	@echo "Create the $(DB_NAME_DEV) database..."
 	DB_NAME=postgres scripts/wait-for-db
-	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}" -c "CREATE DATABASE ${DB_NAME_DEV}" || true
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"$(DB_PASSWORD)"@$(DB_HOST):"$(DB_PORT)" -c "CREATE DATABASE $(DB_NAME_DEV)" || true
 
 .PHONY: db_dev_run
 db_dev_run: db_dev_create ## Run Dev DB (start and create)
@@ -263,15 +263,15 @@ db_dev_reset: db_dev_destroy db_dev_run ## Reset Dev DB (destroy and run)
 
 .PHONY: db_dev_migrate_standalone
 db_dev_migrate_standalone: bin/orders ## Migrate Dev DB directly
-	@echo "Migrating the ${DB_NAME_DEV} database..."
-	DB_DEBUG=0 bin/orders migrate -p "file://migrations/${APPLICATION}/secure;file://migrations/${APPLICATION}/schema" -m "migrations/${APPLICATION}/migrations_manifest.txt"
+	@echo "Migrating the $(DB_NAME_DEV) database..."
+	DB_DEBUG=0 bin/orders migrate -p "file://migrations/$(APPLICATION)/secure;file://migrations/$(APPLICATION)/schema" -m "migrations/$(APPLICATION)/migrations_manifest.txt"
 
 .PHONY: db_dev_migrate
 db_dev_migrate: db_dev_migrate_standalone ## Migrate Dev DB
 
 .PHONY: db_dev_psql
 db_dev_psql: ## Open PostgreSQL shell for Dev DB
-	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}"/"${DB_NAME}"
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"$(DB_PASSWORD)"@$(DB_HOST):"$(DB_PORT)"/"$(DB_NAME)"
 
 #
 # ----- END DB_DEV TARGETS -----
@@ -283,14 +283,14 @@ db_dev_psql: ## Open PostgreSQL shell for Dev DB
 
 .PHONY: db_deployed_migrations_destroy
 db_deployed_migrations_destroy: ## Destroy Deployed Migrations DB
-	@echo "Destroying the ${DB_NAME_DEPLOYED_MIGRATIONS} database ..."
-	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}" -c "DROP DATABASE IF EXISTS ${DB_NAME_DEPLOYED_MIGRATIONS};" || true
+	@echo "Destroying the $(DB_NAME_DEPLOYED_MIGRATIONS) database ..."
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"$(DB_PASSWORD)"@$(DB_HOST):"$(DB_PORT)" -c "DROP DATABASE IF EXISTS $(DB_NAME_DEPLOYED_MIGRATIONS);" || true
 
 .PHONY: db_deployed_migrations_create
 db_deployed_migrations_create: ## Create Deployed Migrations DB
-	@echo "Create the ${DB_NAME_DEPLOYED_MIGRATIONS} database..."
+	@echo "Create the $(DB_NAME_DEPLOYED_MIGRATIONS) database..."
 	DB_NAME=postgres scripts/wait-for-db
-	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}" -c "CREATE DATABASE ${DB_NAME_DEPLOYED_MIGRATIONS}" || true
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"$(DB_PASSWORD)"@$(DB_HOST):"$(DB_PORT)" -c "CREATE DATABASE $(DB_NAME_DEPLOYED_MIGRATIONS)" || true
 
 .PHONY: db_deployed_migrations_run
 db_deployed_migrations_run: db_deployed_migrations_create ## Run Deployed Migrations DB (start and create)
@@ -300,15 +300,15 @@ db_deployed_migrations_reset: db_deployed_migrations_destroy db_deployed_migrati
 
 .PHONY: db_deployed_migrations_migrate_standalone
 db_deployed_migrations_migrate_standalone: bin/orders ## Migrate Deployed Migrations DB with local secure migrations
-	@echo "Migrating the ${DB_NAME_DEPLOYED_MIGRATIONS} database..."
-	DB_NAME=${DB_NAME_DEPLOYED_MIGRATIONS} DB_DEBUG=0 bin/orders migrate -p "file://migrations/${APPLICATION}/secure;file://migrations/${APPLICATION}/schema" -m "migrations/${APPLICATION}/migrations_manifest.txt"
+	@echo "Migrating the $(DB_NAME_DEPLOYED_MIGRATIONS) database..."
+	DB_NAME=$(DB_NAME_DEPLOYED_MIGRATIONS) DB_DEBUG=0 bin/orders migrate -p "file://migrations/$(APPLICATION)/secure;file://migrations/$(APPLICATION)/schema" -m "migrations/$(APPLICATION)/migrations_manifest.txt"
 
 .PHONY: db_deployed_migrations_migrate
 db_deployed_migrations_migrate: db_deployed_migrations_migrate_standalone ## Migrate Deployed Migrations DB
 
 .PHONY: db_deployed_psql
 db_deployed_migrations_psql: ## Open PostgreSQL shell for Deployed Migrations DB
-	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}"/"${DB_NAME_DEPLOYED_MIGRATIONS}"
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"$(DB_PASSWORD)"@$(DB_HOST):"$(DB_PORT)"/"$(DB_NAME_DEPLOYED_MIGRATIONS)"
 
 #
 # ----- END DB_DEPLOYED_MIGRATIONS TARGETS -----
@@ -320,14 +320,14 @@ db_deployed_migrations_psql: ## Open PostgreSQL shell for Deployed Migrations DB
 
 .PHONY: db_test_destroy
 db_test_destroy: ## Destroy Test DB
-	@echo "Destroying the ${DB_NAME_TEST} database ..."
-	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}" -c "DROP DATABASE IF EXISTS ${DB_NAME_TEST};" || true
+	@echo "Destroying the $(DB_NAME_TEST) database ..."
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"$(DB_PASSWORD)"@$(DB_HOST):"$(DB_PORT)" -c "DROP DATABASE IF EXISTS $(DB_NAME_TEST);" || true
 
 .PHONY: db_test_create
 db_test_create: ## Create Test DB
-	@echo "Create the ${DB_NAME_TEST} database..."
+	@echo "Create the $(DB_NAME_TEST) database..."
 	DB_NAME=postgres scripts/wait-for-db
-	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}" -c "CREATE DATABASE ${DB_NAME_TEST}" || true
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"$(DB_PASSWORD)"@$(DB_HOST):"$(DB_PORT)" -c "CREATE DATABASE $(DB_NAME_TEST)" || true
 
 .PHONY: db_test_run
 db_test_run: db_test_create ## Run Test DB (start and create)
@@ -337,15 +337,15 @@ db_test_reset: db_test_destroy db_test_run ## Reset Test DB (destroy and run)
 
 .PHONY: db_test_migrate_standalone
 db_test_migrate_standalone: bin/orders ## Migrate Test DB directly
-	@echo "Migrating the ${DB_NAME_TEST} database..."
-	DB_NAME=${DB_NAME_TEST} DB_DEBUG=0 bin/orders migrate -p "file://migrations/${APPLICATION}/secure;file://migrations/${APPLICATION}/schema" -m "migrations/${APPLICATION}/migrations_manifest.txt"
+	@echo "Migrating the $(DB_NAME_TEST) database..."
+	DB_NAME=$(DB_NAME_TEST) DB_DEBUG=0 bin/orders migrate -p "file://migrations/$(APPLICATION)/secure;file://migrations/$(APPLICATION)/schema" -m "migrations/$(APPLICATION)/migrations_manifest.txt"
 
 .PHONY: db_test_migrate
 db_test_migrate: db_test_migrate_standalone ## Migrate Test DB
 
 .PHONY: db_test_psql
 db_test_psql: ## Open PostgreSQL shell for Test DB
-	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"${DB_PASSWORD}"@${DB_HOST}:"${DB_PORT}"/"${DB_NAME_TEST}"
+	/usr/bin/psql --variable "ON_ERROR_STOP=1" postgres://postgres:"$(DB_PASSWORD)"@$(DB_HOST):"$(DB_PORT)"/"$(DB_NAME_TEST)"
 
 #
 # ----- END DB_TEST TARGETS -----
@@ -357,9 +357,9 @@ db_test_psql: ## Open PostgreSQL shell for Test DB
 
 .PHONY: run_experimental_migrations
 run_experimental_migrations: bin/orders db_deployed_migrations_reset ## Run Experimental migrations against Deployed Migrations DB
-	@echo "Migrating the ${DB_NAME_DEPLOYED_MIGRATIONS} database with experimental migrations..."
-	MIGRATION_PATH="s3://transcom-ppp-${APPLICATION}-experimental-us-west-2/secure-migrations;file://migrations/$(APPLICATION)/schema" \
-	DB_HOST=${DB_HOST} \
+	@echo "Migrating the $(DB_NAME_DEPLOYED_MIGRATIONS) database with experimental migrations..."
+	MIGRATION_PATH="s3://transcom-ppp-$(APPLICATION)-experimental-us-west-2/secure-migrations;file://migrations/$(APPLICATION)/schema" \
+	DB_HOST=$(DB_HOST) \
 	DB_PORT=$(DB_PORT_DEPLOYED_MIGRATIONS) \
 	DB_NAME=$(DB_NAME_DEPLOYED_MIGRATIONS) \
 	DB_DEBUG=0 \
@@ -375,9 +375,9 @@ run_experimental_migrations: bin/orders db_deployed_migrations_reset ## Run Expe
 
 .PHONY: docker_compose_branch_up
 docker_compose_branch_up: ## Bring up docker-compose containers for current branch with AWS ECR images
-	aws-vault exec "${AWS_PROFILE}" -- docker run -it -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SECURITY_TOKEN -e AWS_SESSION_TOKEN milmove/circleci-docker:milmove-orders aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+	aws-vault exec "$(AWS_PROFILE)" -- docker run -it -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SECURITY_TOKEN -e AWS_SESSION_TOKEN milmove/circleci-docker:milmove-orders aws ecr get-login-password --region "$(AWS_DEFAULT_REGION)" | docker login --username AWS --password-stdin $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_DEFAULT_REGION).amazonaws.com
 	scripts/update-docker-compose
-	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.branch.yml up --remove-orphans
+	aws-vault exec "$(AWS_PROFILE)" -- docker-compose -f docker-compose.branch.yml up --remove-orphans
 
 .PHONY: docker_compose_branch_down
 docker_compose_branch_down: ## Destroy docker-compose containers for current branch
@@ -388,7 +388,7 @@ docker_compose_branch_down: ## Destroy docker-compose containers for current bra
 
 .PHONY: docker_compose_local_up
 docker_compose_local_up: ## Bring up docker-compose containers for current local with AWS ECR images
-	aws-vault exec "${AWS_PROFILE}" -- docker-compose -f docker-compose.local.yml up --remove-orphans
+	aws-vault exec "$(AWS_PROFILE)" -- docker-compose -f docker-compose.local.yml up --remove-orphans
 
 .PHONY: docker_compose_local_down
 docker_compose_local_down: ## Destroy docker-compose containers for current local
