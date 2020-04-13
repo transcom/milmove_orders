@@ -2,9 +2,6 @@
 
 set -eux -o pipefail
 
-# Setting REACT_APP_NODE_ENV to develompent enables the "Local Sign In" button
-export REACT_APP_NODE_ENV=development
-
 # Set Defaults
 NETWORK="milmove_orders_default" # Docker network
 
