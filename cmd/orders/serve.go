@@ -372,6 +372,7 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 	// are added, but the resulting http.Handlers execute in "normal" order
 	// (i.e., the http.Handler returned by the first Middleware added gets
 	// called first).
+	site.Use(middleware.Recovery(logger))
 	site.Use(middleware.SecurityHeaders(logger))
 	if maxBodySize := v.GetInt64(cli.MaxBodySizeFlag); maxBodySize > 0 {
 		site.Use(middleware.LimitBodySize(maxBodySize, logger))
@@ -444,6 +445,7 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 
 	staticMux := goji.SubMux()
 	staticMux.Use(middleware.ValidMethodsStatic(logger))
+	staticMux.Use(middleware.RequestLogger(logger))
 
 	// Explicitly disable swagger.json route
 	site.Handle(pat.Get("/swagger.json"), http.NotFoundHandler())
@@ -462,6 +464,7 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 		ordersMux.Use(ordersDetectionMiddleware)
 		ordersMux.Use(middleware.NoCache(logger))
 		ordersMux.Use(clientCertMiddleware)
+		ordersMux.Use(middleware.RequestLogger(logger))
 		ordersMux.Handle(pat.Get("/swagger.yaml"), fileHandler(v.GetString(cli.OrdersSwaggerFlag)))
 		if v.GetBool(cli.ServeSwaggerUIFlag) {
 			logger.Info("Orders API Swagger UI serving is enabled")
@@ -475,7 +478,6 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 
 	// Handlers under mutual TLS need to go before this section that sets up middleware that shouldn't be enabled for mutual TLS (such as CSRF)
 	root := goji.NewMux()
-	root.Use(middleware.Recovery(logger))
 	root.Use(middleware.Trace(logger, &handlerContext))            // injects http request trace id
 	root.Use(middleware.ContextLogger("milmove_trace_id", logger)) // injects http request logger
 	root.Use(middleware.RequestLogger(logger))

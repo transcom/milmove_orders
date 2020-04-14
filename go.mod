@@ -33,7 +33,7 @@ require (
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/objx v0.2.0
 	github.com/stretchr/testify v1.5.1
-	github.com/transcom/mymove v0.0.0-20200313204145-d3eca0002421
+	github.com/transcom/mymove v0.0.0-20200413222450-b2771f9c20a5
 	go.uber.org/zap v1.14.1
 	goji.io v2.0.2+incompatible
 	golang.org/x/mod v0.2.0 // indirect
