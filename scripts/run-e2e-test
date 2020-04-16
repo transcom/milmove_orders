@@ -35,6 +35,8 @@ if [[ -n "${CIRCLECI+x}" ]]; then
   # Can't mount folders in CircleCI so copy this data in
   # https://circleci.com/docs/2.0/building-docker-images/#mounting-folders
   docker cp ./migrations/orders/secure milmove_orders_milmove_migrate_1:/migrate/
+  docker cp ./config/tls/devlocal-ca.key milmove_orders_milmove_1:/config/tls/devlocal-ca.key
+  docker cp ./config/tls/devlocal-ca.pem milmove_orders_milmove_1:/config/tls/devlocal-ca.pem
 
   # Start everything up
   docker-compose -f docker-compose.branch.yml up -d --no-recreate --remove-orphans
