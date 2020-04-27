@@ -34,7 +34,7 @@ require (
 	github.com/stretchr/objx v0.2.0
 	github.com/stretchr/testify v1.5.1
 	github.com/transcom/mymove v0.0.0-20200413222450-b2771f9c20a5
-	go.uber.org/zap v1.14.1
+	go.uber.org/zap v1.15.0
 	goji.io v2.0.2+incompatible
 	golang.org/x/mod v0.2.0 // indirect
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
