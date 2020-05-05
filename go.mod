@@ -16,7 +16,7 @@ require (
 	github.com/gobuffalo/pop v4.13.1+incompatible
 	github.com/gobuffalo/validate v2.0.4+incompatible
 	github.com/gofrs/flock v0.7.1
-	github.com/gofrs/uuid v3.2.0+incompatible
+	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/imdario/mergo v0.3.9
