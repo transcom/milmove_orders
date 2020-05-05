@@ -23,7 +23,7 @@ require (
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jstemmer/go-junit-report v0.9.1
 	github.com/kr/text v0.2.0 // indirect
-	github.com/lib/pq v1.5.0
+	github.com/lib/pq v1.5.1
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cast v1.3.1 // indirect
