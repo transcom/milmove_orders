@@ -374,6 +374,9 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 	// called first).
 	site.Use(middleware.Recovery(logger))
 	site.Use(middleware.SecurityHeaders(logger))
+	site.Use(middleware.Trace(logger, &handlerContext)) // injects http request trace id
+	site.Use(middleware.ContextLogger("milmove_trace_id", logger))
+
 	if maxBodySize := v.GetInt64(cli.MaxBodySizeFlag); maxBodySize > 0 {
 		site.Use(middleware.LimitBodySize(maxBodySize, logger))
 	}
@@ -478,8 +481,6 @@ func serveFunction(cmd *cobra.Command, args []string) error {
 
 	// Handlers under mutual TLS need to go before this section that sets up middleware that shouldn't be enabled for mutual TLS (such as CSRF)
 	root := goji.NewMux()
-	root.Use(middleware.Trace(logger, &handlerContext))            // injects http request trace id
-	root.Use(middleware.ContextLogger("milmove_trace_id", logger)) // injects http request logger
 	root.Use(middleware.RequestLogger(logger))
 
 	site.Handle(pat.New("/*"), root)
