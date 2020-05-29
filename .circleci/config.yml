@@ -559,7 +559,7 @@ workflows:
           # if testing on experimental, you can disable these tests by using the commented block below.
           filters:
             branches:
-              ignore: placeholder_branch_name
+              ignore: rd-test
 
       - server_test:
           requires:
@@ -567,7 +567,7 @@ workflows:
           # if testing on experimental, you can disable these tests by using the commented block below.
           filters:
             branches:
-              ignore: placeholder_branch_name
+              ignore: rd-test
 
       - build_orders:
           requires:
@@ -595,14 +595,14 @@ workflows:
             - build_migrations
           filters:
             branches:
-              only: placeholder_branch_name
+              only: rd-test
 
       - deploy_experimental_app:
           requires:
             - deploy_experimental_migrations
           filters:
             branches:
-              only: placeholder_branch_name
+              only: rd-test
 
 experimental:
   notify:
