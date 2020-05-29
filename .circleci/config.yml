@@ -51,18 +51,18 @@ executors:
 commands:
   announce_failure:
     steps:
-      - slack/status:
-          fail_only: true
-          failure_message: 'The ${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} commit ${CIRCLE_SHA1} broke on job ${CIRCLE_JOB}! Contact ${CIRCLE_USERNAME} for more information.'
-          only_for_branches: master
-          webhook: ${SLACK_WEBHOOK_URL}
-      - run:
-          name: Announce failure for failed Deploys on master branch to Pager Duty
-          command: scripts/circleci-announce-broken-branch
-          when: on_fail
-          filters:
-            branches:
-              only: master
+      # - slack/status:
+      #     fail_only: true
+      #     failure_message: 'The ${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} commit ${CIRCLE_SHA1} broke on job ${CIRCLE_JOB}! Contact ${CIRCLE_USERNAME} for more information.'
+      #     only_for_branches: master
+      #     webhook: ${SLACK_WEBHOOK_URL}
+      # - run:
+      #     name: Announce failure for failed Deploys on master branch to Pager Duty
+      #     command: scripts/circleci-announce-broken-branch
+      #     when: on_fail
+      #     filters:
+      #       branches:
+      #         only: master
 
   deploy_migrations_steps:
     parameters:
