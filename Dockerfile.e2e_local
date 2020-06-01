@@ -16,7 +16,7 @@ RUN rm -f bin/orders-api-client && make bin/orders-api-client
 # FINAL #
 #########
 
-FROM alpine:3.11.6
+FROM alpine:3.12.0
 
 COPY --from=builder --chown=root:root /home/circleci/project/bin/orders-api-client /bin/orders-api-client
 
