@@ -32,7 +32,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/objx v0.2.0
-	github.com/stretchr/testify v1.6.0
+	github.com/stretchr/testify v1.6.1
 	github.com/transcom/mymove v0.0.0-20200413222450-b2771f9c20a5
 	go.uber.org/zap v1.15.0
 	goji.io v2.0.2+incompatible
