@@ -81,10 +81,10 @@ commands:
             source $BASH_ENV
       - run:
           name: Snapshot database
-          command: scripts/rds-snapshot-orders-db << parameters.environment >>
+          command: do-exclusively --job-name ${CIRCLE_JOB} scripts/rds-snapshot-orders-db << parameters.environment >>
       - run:
           name: Run migrations
-          command: scripts/ecs-run-orders-migrations-container "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/<< parameters.repo >>@${ECR_DIGEST}" << parameters.environment >>
+          command: do-exclusively --job-name ${CIRCLE_JOB} scripts/ecs-run-orders-migrations-container "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/<< parameters.repo >>@${ECR_DIGEST}" << parameters.environment >>
           no_output_timeout: 60m
           environment:
             CHAMBER_RETRIES: 20
@@ -117,7 +117,7 @@ commands:
             source $BASH_ENV
       - deploy:
           name: Deploy orders service
-          command: scripts/ecs-deploy-service-container orders "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/<< parameters.repo >>@${ECR_DIGEST}" << parameters.environment >>
+          command: do-exclusively --job-name ${CIRCLE_JOB} scripts/ecs-deploy-service-container orders "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/<< parameters.repo >>@${ECR_DIGEST}" << parameters.environment >>
           no_output_timeout: 20m
       - run:
           name: Health Check
