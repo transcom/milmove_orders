@@ -3,7 +3,7 @@ module github.com/transcom/milmove_orders
 go 1.14
 
 require (
-	github.com/aws/aws-sdk-go v1.33.9
+	github.com/aws/aws-sdk-go v1.33.10
 	github.com/codegangsta/gin v0.0.0-20171026143024-cafe2ce98974
 	github.com/go-openapi/errors v0.19.4
 	github.com/go-openapi/loads v0.19.5
