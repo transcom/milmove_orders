@@ -15,7 +15,7 @@ require (
 	github.com/gobuffalo/envy v1.9.0
 	github.com/gobuffalo/pop v4.13.1+incompatible
 	github.com/gobuffalo/validate v2.0.4+incompatible
-	github.com/gofrs/flock v0.7.1
+	github.com/gofrs/flock v0.8.0
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
