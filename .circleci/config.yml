@@ -180,7 +180,7 @@ commands:
           dockerfile: << parameters.dockerfile >>
           region: AWS_DEFAULT_REGION
           repo: << parameters.repo >>
-          tag: "git-${CIRCLE_SHA1},git-branch-${BRANCH_NAME}"
+          tag: 'git-${CIRCLE_SHA1},git-branch-${BRANCH_NAME}'
       - ecr_record_image_digest:
           repo: << parameters.repo >>
       - ecr_describe_image_scan_findings:
@@ -195,13 +195,13 @@ commands:
           name: make server_test_build for <<parameters.application>>
           command: make server_test_build
           environment:
-            APPLICATION: "<< parameters.application >>"
-            GOFLAGS: "-p=4"
+            APPLICATION: '<< parameters.application >>'
+            GOFLAGS: '-p=4'
       - run:
           name: make db_test_reset for <<parameters.application>>
           command: make db_test_reset
           environment:
-            APPLICATION: "<< parameters.application >>"
+            APPLICATION: '<< parameters.application >>'
             DB_PASSWORD: mysecretpassword
             DB_USER: postgres
             DB_HOST: localhost
@@ -215,7 +215,7 @@ commands:
           name: make db_test_migrate for <<parameters.application>>
           command: make db_test_migrate
           environment:
-            APPLICATION: "<< parameters.application >>"
+            APPLICATION: '<< parameters.application >>'
             DB_PASSWORD: mysecretpassword
             DB_USER: postgres
             DB_HOST: localhost
@@ -232,7 +232,7 @@ commands:
             source $BASH_ENV
             make server_test_standalone
           environment:
-            APPLICATION: "<< parameters.application >>"
+            APPLICATION: '<< parameters.application >>'
             DB_PASSWORD: mysecretpassword
             DB_USER: postgres
             DB_HOST: localhost
@@ -243,7 +243,7 @@ commands:
             EIA_KEY: db2522a43820268a41a802a16ae9fd26 # dummy key generated with openssl rand -hex 16
             ENV: test
             ENVIRONMENT: test
-            GOFLAGS: "-p=4"
+            GOFLAGS: '-p=4'
             JUNIT: 1
             MIGRATION_MANIFEST: '/home/circleci/milmove_orders/migrations/<< parameters.application >>/migrations_manifest.txt'
             MIGRATION_PATH: 'file:///home/circleci/milmove_orders/migrations/<< parameters.application >>/schema;file:///home/circleci/milmove_orders/migrations/<< parameters.application >>/secure'
@@ -465,7 +465,7 @@ jobs:
       - run: make bin/health-checker
       - run: make bin/tls-checker
       - persist_to_workspace:
-          root:  /home/circleci/milmove_orders/bin
+          root: /home/circleci/milmove_orders/bin
           paths:
             - ecs-deploy # for registering task defs and deploying task container
             - health-checker # for health check after deploy
@@ -559,7 +559,7 @@ workflows:
           # if testing on experimental, you can disable these tests by using the commented block below.
           filters:
             branches:
-              ignore: placeholder_branch_name
+              ignore: am-remove-lee-cac-access
 
       - server_test:
           requires:
@@ -567,7 +567,7 @@ workflows:
           # if testing on experimental, you can disable these tests by using the commented block below.
           filters:
             branches:
-              ignore: placeholder_branch_name
+              ignore: am-remove-lee-cac-access
 
       - build_orders:
           requires:
@@ -595,14 +595,14 @@ workflows:
             - build_migrations
           filters:
             branches:
-              only: placeholder_branch_name
+              only: am-remove-lee-cac-access
 
       - deploy_experimental_app:
           requires:
             - deploy_experimental_migrations
           filters:
             branches:
-              only: placeholder_branch_name
+              only: am-remove-lee-cac-access
 
 experimental:
   notify:
